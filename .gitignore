@@ -1,0 +1,5 @@
+set_sf_env.sh
+.DS_Store
+*.log
+*.tmp
+*.bak
