@@ -3,3 +3,4 @@ set_sf_env.sh
 *.log
 *.tmp
 *.bak
+*.terraform
