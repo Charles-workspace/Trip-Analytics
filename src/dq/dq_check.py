@@ -27,7 +27,7 @@ class DQCheck :
         """
         cond = self.build_null_condition()
 
-        print(cond)
+        #print(cond)
 
         print ("Invalid rows with null/empty values in key columns")
         df_invalid = df.filter(cond)
