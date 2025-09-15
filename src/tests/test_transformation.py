@@ -3,14 +3,11 @@ import os
 from types import SimpleNamespace
 
 # Must set **all required env vars** before importing anything that depends on them
-os.environ["snowflake_account_name"] = "dummy_account"
-os.environ["snowflake_user"] = "dummy_user"
-os.environ["snowflake_password"] = "dummy_password"
-os.environ["snowflake_warehouse"] = "dummy_wh"
-os.environ["snowflake_role"] = "dummy_role"
-os.environ["snowflake_database"] = "dummy_db"
-os.environ["snowflake_schema"] = "dummy_schema"
-os.environ["snowflake_account_region"] = "dummy_region"
+os.environ["SNOWFLAKE_ACCOUNT_NAME"] = "dummy_account"
+os.environ["SNOWFLAKE_USER"] = "dummy_user"
+os.environ["SNOWFLAKE_PASSWORD"] = "dummy_password"
+os.environ["SNOWFLAKE_ROLE"] = "dummy_role"
+
 
 from unittest.mock import MagicMock, patch
 from src.transform.trip_data_transformer import trip_records_transformer

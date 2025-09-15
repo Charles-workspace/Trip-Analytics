@@ -6,12 +6,12 @@ from src.transform.weather_data_transformer import pivot_weather_table
 from src.dq.dq_check import DQCheck
 from src.configs.data_objects import config
 from src.configs.connection_config import connection_parameters
-from dotenv import load_dotenv
+from pathlib import Path
+import os
 
 
 def main():
 
-    load_dotenv("/Users/charlessanthakumar/Documents/Trip-Analytics/set_sf_env.sh", override=True)
     session = Session.builder.configs(vars(connection_parameters)).create()
 
     df_trip_orig = session.table(config.raw_trip_data)
