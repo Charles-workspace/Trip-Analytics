@@ -25,3 +25,8 @@ resource "snowflake_database" "outbound_integration" {
   name    = "OUTBOUND_INTEGRATION"
   comment = "Database to hold processed data"
 }
+
+resource "snowflake_database" "ops" {
+  name    = "OPS"
+  comment = "Database to docker image of projects"
+}

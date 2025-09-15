@@ -39,3 +39,9 @@ resource "snowflake_schema" "trip_analytics" {
   database = "OUTBOUND_INTEGRATION"
   comment  = "Schema for processed final data"
 }
+
+resource "snowflake_schema" "spcs_deployment" {
+  name     = "SPCS_DEPLOYMENT"
+  database = "OPS"
+  comment  = "Schema for storing docker images"
+}

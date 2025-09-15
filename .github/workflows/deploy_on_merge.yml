@@ -1,0 +1,45 @@
+name: Deploy on Merge
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+    deploy-to-snowflake:
+        name: Build and deploy Docker image to Snowflake
+        runs-on: ubuntu-latest
+        
+        env:
+            IMAGE_NAME: trip_analytics_app
+            STAGE_NAME: OPS.SPCS_DEPLOYMENT.TRIP_ANALYTICS_CONTAINER_STAGE
+
+        steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+        
+        - name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v3
+
+        - name: Set up Snowflake CLI
+          uses: snowflakedb/snowflake-cli@v1
+
+        - name: Authenticate Snowflake CLI
+          run: |
+            snow config init
+            snow config set account ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
+            snow config set user ${{ secrets.SNOWFLAKE_USER }}
+            snow config set role ${{ secrets.SNOWFLAKE_ROLE }}
+            snow config set authenticator password
+            snow config set password ${{ secrets.SNOWFLAKE_PASSWORD }}
+
+        - name: Build Docker image
+          run: |
+            docker build --no-cache -t $IMAGE_NAME .
+
+        - name: Tag Docker image
+          run: |
+            docker tag $IMAGE_NAME snowflake_registry/${{ env.STAGE_NAME }}/$IMAGE_NAME:latest
+
+        - name: Push Docker Image to Snowflake Stage
+          run: |
+            snow image push --image-name $IMAGE_NAME --stage $STAGE_NAME --tag latest

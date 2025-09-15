@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.vscode/
+.venv/
+.env
+*.ipynb
+src/tests/
+src/.pytest_cache/
+src/__pycache__/
+.python-version
