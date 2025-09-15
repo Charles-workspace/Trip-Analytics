@@ -12,6 +12,7 @@ jobs:
         env:
             IMAGE_NAME: trip_analytics_app
             STAGE_NAME: OPS.SPCS_DEPLOYMENT.TRIP_ANALYTICS_CONTAINER_STAGE
+            STAGE_NAME_LOWER: ops.spcs_deployment.trip_analytics_container_stage
             SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
             SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
             SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
@@ -36,7 +37,7 @@ jobs:
 
         - name: Tag Docker image
           run: |
-            docker tag $IMAGE_NAME snowflake_registry/${{ env.STAGE_NAME }}/$IMAGE_NAME:latest
+            docker tag $IMAGE_NAME snowflake_registry/${{ env.STAGE_NAME_LOWER }}/$IMAGE_NAME:latest
 
         - name: Push Docker Image to Snowflake Stage
           run: |
