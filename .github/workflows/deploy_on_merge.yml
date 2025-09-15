@@ -12,6 +12,11 @@ jobs:
         env:
             IMAGE_NAME: trip_analytics_app
             STAGE_NAME: OPS.SPCS_DEPLOYMENT.TRIP_ANALYTICS_CONTAINER_STAGE
+            SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
+            SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+            SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+            SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+            SNOWFLAKE_AUTHENTICATOR: password
 
         steps:
         - name: Checkout code
@@ -24,15 +29,6 @@ jobs:
           uses: snowflakedb/snowflake-cli-action@v2.0
           with:
                 cli-version: "3.11.0"
-
-        - name: Authenticate Snowflake CLI
-          run: |
-            snow config init
-            snow config set account ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
-            snow config set user ${{ secrets.SNOWFLAKE_USER }}
-            snow config set role ${{ secrets.SNOWFLAKE_ROLE }}
-            snow config set authenticator password
-            snow config set password ${{ secrets.SNOWFLAKE_PASSWORD }}
 
         - name: Build Docker image
           run: |
