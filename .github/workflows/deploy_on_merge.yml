@@ -18,6 +18,11 @@ jobs:
             SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
             SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
             SNOWFLAKE_AUTHENTICATOR: password
+            SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
+            SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+            SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+            SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+            SNOWFLAKE_AUTHENTICATOR: password
 
         steps:
         - name: Checkout code
@@ -30,7 +35,7 @@ jobs:
           uses: snowflakedb/snowflake-cli-action@v2.0
           with:
                 cli-version: "3.11.0"
-
+        
         - name: Build Docker image
           run: |
             docker build --no-cache -t $IMAGE_NAME .
