@@ -4,8 +4,8 @@ set_sf_env.sh
 *.tmp
 *.bak
 *.terraform
-requirements.txt
 .venv/
 __pycache__/
 .python-version
 *.env
+.pytest_cache/
