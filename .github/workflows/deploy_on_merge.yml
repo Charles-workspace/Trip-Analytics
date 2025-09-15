@@ -41,4 +41,4 @@ jobs:
 
         - name: Push Docker Image to Snowflake Stage
           run: |
-            snow image push --image-name $IMAGE_NAME --stage $STAGE_NAME --tag latest
+            snow docker image push --image-name $IMAGE_NAME --stage $STAGE_NAME --tag latest
