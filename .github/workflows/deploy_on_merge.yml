@@ -21,7 +21,9 @@ jobs:
           uses: docker/setup-buildx-action@v3
 
         - name: Set up Snowflake CLI
-          uses: snowflakedb/snowflake-cli-action@v1
+          uses: snowflakedb/snowflake-cli-action@v2.0
+          with:
+                cli-version: "3.11.0"
 
         - name: Authenticate Snowflake CLI
           run: |
