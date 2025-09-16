@@ -44,7 +44,7 @@ jobs:
                 --schema default_image_store \
                 --host qmwkxar-ob52901.snowflakecomputing.com \
                 --region eu-north-1 \
-                --authenticator snowflake \
+                --authenticator password \
                 --no-interactive \
                 --default
                 snow spcs image-registry login
