@@ -11,8 +11,8 @@ jobs:
         
         env:
             IMAGE_NAME: trip_analytics_app
-            STAGE_NAME: OPS.SPCS_DEPLOYMENT.TRIP_ANALYTICS_CONTAINER_STAGE
-            STAGE_NAME_LOWER: ops.spcs_deployment.trip_analytics_container_stage
+            STAGE_NAME: SNOWFLAKE.DEFAULT_IMAGE_STORE.ML_REPO
+            STAGE_NAME_LOWER: snowflake/default_image_store/ml_repo
             SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
             SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
             SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
@@ -31,14 +31,37 @@ jobs:
           with:
                 cli-version: "3.11.0"
 
+        - name: Add Snowflake connection
+          run: |
+                snow connection add \
+                --connection-name test_connection \
+                --accountname ${{ secrets.SNOWFLAKE_ACCOUNT }} \
+                --username ${{ secrets.SNOWFLAKE_USER }} \
+                --password ${{ secrets.SNOWFLAKE_PASSWORD }} \
+                --role ${{ secrets.SNOWFLAKE_ROLE }} \
+                --warehouse X-Small \
+                --database snowflake \
+                --schema default_image_store \
+                --host qmwkxar-ob52901.snowflakecomputing.com \
+                --region eu-north-1 \
+                --authenticator password \
+                --no-interactive \
+                --default
+
+        - name: Login to Snowflake Image Registry
+          run: |
+                snow spcs image-registry login --connection $CONNECTION_NAME
+
         - name: Build Docker image
           run: |
             docker build --no-cache -t $IMAGE_NAME .
 
         - name: Tag Docker image
           run: |
-            docker tag $IMAGE_NAME snowflake_registry/${{ env.STAGE_NAME_LOWER }}/$IMAGE_NAME:latest
+            docker tag $IMAGE_NAME ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
+            
 
         - name: Push Docker Image to Snowflake Stage
           run: |
-            snow docker image push --image-name $IMAGE_NAME --stage $STAGE_NAME --tag latest
+            docker push ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}
+
