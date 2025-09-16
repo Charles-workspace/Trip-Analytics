@@ -42,7 +42,7 @@ jobs:
                 --warehouse X-Small \
                 --database snowflake \
                 --schema default_image_store \
-                --host qmwkxar-ob52901.snowflakecomputing.com \
+                --host ${{ env.SNOWFLAKE_ACCOUNT }}.snowflakecomputing.com \
                 --region eu-north-1 \
                 --authenticator snowflake \
                 --no-interactive \
@@ -55,11 +55,12 @@ jobs:
 
         - name: Tag Docker image
           run: |
-            docker tag $IMAGE_NAME qmwkxar-ob52901.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
+            docker tag $IMAGE_NAME ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
 
         - name: Show Docker config
           run: cat ~/.docker/config.json
 
         - name: Push Docker Image to Snowflake Stage
           run: |
-            docker push qmwkxar-ob52901.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
+            docker push ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
+
