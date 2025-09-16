@@ -64,3 +64,4 @@ jobs:
         - name: Push Docker Image to Snowflake Stage
           run: |
             docker push ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}
+
