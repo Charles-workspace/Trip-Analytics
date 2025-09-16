@@ -50,7 +50,7 @@ jobs:
 
         - name: Login to Snowflake Image Registry
           run: |
-                snow spcs image-registry login --connection $CONNECTION_NAME
+                snow spcs image-registry login --connection test_connection
 
         - name: Build Docker image
           run: |
