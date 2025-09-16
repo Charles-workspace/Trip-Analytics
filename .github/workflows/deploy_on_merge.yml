@@ -1,7 +1,7 @@
 name: Deploy on Merge
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 jobs:
@@ -55,11 +55,9 @@ jobs:
 
         - name: Tag Docker image
           run: |
-            docker tag $IMAGE_NAME qmwkxar-ob52901.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
+            docker tag $IMAGE_NAME ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
 
-        - name: Show Docker config
-          run: cat ~/.docker/config.json
 
         - name: Push Docker Image to Snowflake Stage
           run: |
-            docker push qmwkxar-ob52901.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
+            docker push ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
