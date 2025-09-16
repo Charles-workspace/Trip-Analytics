@@ -17,6 +17,7 @@ jobs:
             SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
             SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
             SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+            SNOWFLAKE_AUTHENTICATOR: password
 
         steps:
         - name: Checkout code
@@ -30,15 +31,7 @@ jobs:
           with:
                 cli-version: "3.11.0"
 
-        - name: Build Docker image
-          run: |
-            docker build --no-cache -t $IMAGE_NAME .
-
-        - name: Tag Docker image
-          run: |
-            docker tag $IMAGE_NAME ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
-
-        - name: Add Snowflake connection, login to image registry and push Docker image
+        - name: Add Snowflake connection
           run: |
                 snow connection add \
                 --connection-name github_ci_connection \
@@ -55,4 +48,18 @@ jobs:
                 --no-interactive \
                 --default
                 snow spcs image-registry login
-                docker push ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
+
+        - name: Build Docker image
+          run: |
+            docker build --no-cache -t $IMAGE_NAME .
+
+        - name: Tag Docker image
+          run: |
+            docker tag $IMAGE_NAME qmwkxar-ob52901.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
+
+        - name: Show Docker config
+          run: cat ~/.docker/config.json
+
+        - name: Push Docker Image to Snowflake Stage
+          run: |
+            docker push qmwkxar-ob52901.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
