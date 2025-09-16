@@ -1,7 +1,7 @@
 name: Deploy on Merge
 
 on:
-  pull_request:
+  push:
     branches:
       - main
 jobs:
@@ -42,7 +42,7 @@ jobs:
                 --warehouse X-Small \
                 --database snowflake \
                 --schema default_image_store \
-                --host qmwkxar-ob52901.snowflakecomputing.com \
+                --host ${{ env.SNOWFLAKE_ACCOUNT }}.snowflakecomputing.com \
                 --region eu-north-1 \
                 --authenticator snowflake \
                 --no-interactive \
