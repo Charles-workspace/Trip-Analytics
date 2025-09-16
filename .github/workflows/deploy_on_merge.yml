@@ -48,10 +48,6 @@ jobs:
                 --no-interactive \
                 --default
 
-        - name: Login to Snowflake Image Registry
-          run: |
-                snow spcs image-registry login --connection test_connection
-
         - name: Build Docker image
           run: |
             docker build --no-cache -t $IMAGE_NAME .
@@ -60,21 +56,9 @@ jobs:
           run: |
             docker tag $IMAGE_NAME ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
 
-
-        - name: Get Snowflake Registry URL
-          id: get_registry_url
+        - name: Login to Snowflake Image Registry
           run: |
-            REGISTRY_URL=$(snow spcs image-registry url --connection test_connection)
-            echo "::set-output name=registry_url::$REGISTRY_URL"
-
-
-
-        - name: Docker login
-          run: |
-           docker login ${{ steps.get_registry_url.outputs.registry_url }} \
-            -u _token \
-            -p "$(snow spcs image-registry token --connection test_connection)"
-
+                snow spcs image-registry login --connection test_connection
 
         - name: Push Docker Image to Snowflake Stage
           run: |
