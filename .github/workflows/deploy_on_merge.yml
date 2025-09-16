@@ -60,21 +60,21 @@ jobs:
           run: |
             docker tag $IMAGE_NAME ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
 
+
         - name: Get Snowflake Registry URL
           id: get_registry_url
           run: |
             REGISTRY_URL=$(snow spcs image-registry url --connection test_connection)
             echo "::set-output name=registry_url::$REGISTRY_URL"
-          
-        - name: Login to Snowflake Image Registry
-          run: |
-            snow spcs image-registry url --connection test_connection ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com
+
+
 
         - name: Docker login
           run: |
            docker login ${{ steps.get_registry_url.outputs.registry_url }} \
             -u _token \
             -p "$(snow spcs image-registry token --connection test_connection)"
+
 
         - name: Push Docker Image to Snowflake Stage
           run: |
