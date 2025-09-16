@@ -35,7 +35,7 @@ jobs:
           run: |
                 snow connection add \
                 --connection-name test_connection \
-                --accountname ${{ secrets.SNOWFLAKE_ACCOUNT }} \
+                --accountname ${{ secrets.SNOWFLAKE_ACCOUNT_NAME}} \
                 --username ${{ secrets.SNOWFLAKE_USER }} \
                 --password ${{ secrets.SNOWFLAKE_PASSWORD }} \
                 --role ${{ secrets.SNOWFLAKE_ROLE }} \
