@@ -31,7 +31,15 @@ jobs:
           with:
                 cli-version: "3.11.0"
 
-        - name: Add Snowflake connection
+        - name: Build Docker image
+          run: |
+            docker build --no-cache -t $IMAGE_NAME .
+
+        - name: Tag Docker image
+          run: |
+            docker tag $IMAGE_NAME ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
+
+        - name: Add Snowflake connection, login to image registry and push Docker image
           run: |
                 snow connection add \
                 --connection-name github_ci_connection \
@@ -44,19 +52,8 @@ jobs:
                 --schema default_image_store \
                 --host qmwkxar-ob52901.snowflakecomputing.com \
                 --region eu-north-1 \
-                --authenticator password \
+                --authenticator snowflake \
                 --no-interactive \
                 --default
                 snow spcs image-registry login
-
-        - name: Build Docker image
-          run: |
-            docker build --no-cache -t $IMAGE_NAME .
-
-        - name: Tag Docker image
-          run: |
-            docker tag $IMAGE_NAME ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
-
-        - name: Push Docker Image to Snowflake Stage
-          run: |
-            docker push ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
+                docker push ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
