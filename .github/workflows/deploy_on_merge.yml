@@ -59,7 +59,10 @@ jobs:
         - name: Tag Docker image
           run: |
             docker tag $IMAGE_NAME ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
-            
+          
+        - name: Login to Snowflake Image Registry
+          run: |
+            snow spcs image-registry url --connection test_connection ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com
 
         - name: Push Docker Image to Snowflake Stage
           run: |
