@@ -34,11 +34,11 @@ jobs:
         - name: Add Snowflake connection
           run: |
                 snow connection add \
-                --connection-name test_connection \
-                --accountname ${{ secrets.SNOWFLAKE_ACCOUNT_NAME}} \
-                --username ${{ secrets.SNOWFLAKE_USER }} \
-                --password ${{ secrets.SNOWFLAKE_PASSWORD }} \
-                --role ${{ secrets.SNOWFLAKE_ROLE }} \
+                --connection-name github_ci_connection \
+                --accountname ${{ env.SNOWFLAKE_ACCOUNT }} \
+                --username ${{ env.SNOWFLAKE_USER }} \
+                --password ${{ env.SNOWFLAKE_PASSWORD }} \
+                --role ${{ env.SNOWFLAKE_ROLE }} \
                 --warehouse X-Small \
                 --database snowflake \
                 --schema default_image_store \
@@ -47,6 +47,7 @@ jobs:
                 --authenticator snowflake \
                 --no-interactive \
                 --default
+                snow spcs image-registry login
 
         - name: Build Docker image
           run: |
@@ -56,11 +57,6 @@ jobs:
           run: |
             docker tag $IMAGE_NAME ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
 
-        - name: Login to Snowflake Image Registry
-          run: |
-                snow spcs image-registry login --connection test_connection
-
         - name: Push Docker Image to Snowflake Stage
           run: |
-            docker push ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}
-
+            docker push ${{ env.SNOWFLAKE_ACCOUNT }}.registry.snowflakecomputing.com/${{ env.STAGE_NAME_LOWER }}:latest
