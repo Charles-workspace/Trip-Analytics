@@ -1,7 +1,11 @@
 resource "snowflake_table" "trip_analytics" {
   name      = "TRIP_ANALYTICS"
-  database  = "OUTBOUND_INTEGRATION"
-  schema    = "TRIP_ANALYTICS"
+  database  = snowflake_database.outbound_integration.name
+  schema    = snowflake_schema.trip_analytics.name
+
+  depends_on = [
+    snowflake_schema.trip_analytics
+  ]
   comment   = "Final consolidated table with trip and weather data"
 
   column {

@@ -1,7 +1,10 @@
 resource "snowflake_table" "taxi_zone_lookup" {
   name      = "TAXI_ZONE_LOOKUP"
-  database  = "INBOUND_INTEGRATION"
-  schema    = "LANDING_TRIP"
+  database = snowflake_database.inbound_integration.name
+  schema    = snowflake_schema.landing_trip.name
+  depends_on = [
+    snowflake_schema.landing_trip
+  ]
   comment   = "Taxi Zone Lookup Table"
 
   column {
@@ -27,8 +30,11 @@ resource "snowflake_table" "taxi_zone_lookup" {
 
 resource "snowflake_table" "yellow_trip_records" {
   name      = "YELLOW_TRIP_RECORDS"
-  database  = "INBOUND_INTEGRATION"
-  schema    = "LANDING_TRIP"
+  database = snowflake_database.inbound_integration.name
+  schema    = snowflake_schema.landing_trip.name
+  depends_on = [
+    snowflake_schema.landing_trip
+  ]
   comment   = "NYC Yellow Taxi Trip Records Table"
 
   column {
@@ -134,8 +140,11 @@ resource "snowflake_table" "yellow_trip_records" {
 
 resource "snowflake_table" "nyc_weather" {
   name      = "NYC_WEATHER"
-  database  = "INBOUND_INTEGRATION"
-  schema    = "LANDING_WEATHER"
+  database = snowflake_database.inbound_integration.name
+  schema    = snowflake_schema.landing_weather.name
+  depends_on = [
+    snowflake_schema.landing_weather
+  ]
   comment   = "Raw NYC Weather Data Table - unpivoted"
 
   column {
