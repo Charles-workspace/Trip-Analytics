@@ -1,8 +1,11 @@
 resource "snowflake_table" "trip_data_sds" {
-    name = "TRIP_DATA_VALIDATED"
-    database = "INBOUND_INTEGRATION"
-    schema = "SDS_TRIP"
-    comment = "Records that have passed DQ Checks"
+  name = "TRIP_DATA_VALIDATED"
+  database = snowflake_database.inbound_integration.name
+  schema    = snowflake_schema.staging_trip.name
+  depends_on = [
+    snowflake_schema.staging_trip
+  ]
+  comment = "Records that have passed DQ Checks"
 
 column {
     name = "VendorID"
@@ -106,10 +109,13 @@ column {
 }
 
 resource "snowflake_table" "weather_data_sds" {
-    name = "WEATHER_DATA_VALIDATED"
-    database  = "INBOUND_INTEGRATION"
-    schema    = "SDS_WEATHER"
-    comment   = "DQ Validated NYC Weather Data  - unpivoted"
+  name = "WEATHER_DATA_VALIDATED"
+  database = snowflake_database.inbound_integration.name
+  schema    = snowflake_schema.staging_weather.name
+  depends_on = [
+    snowflake_schema.staging_weather
+  ]
+  comment   = "DQ Validated NYC Weather Data  - unpivoted"
 
   column {
     name = "date"

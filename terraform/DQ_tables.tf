@@ -1,7 +1,10 @@
 resource "snowflake_table" "trip_data_null_records" {
   name      = "TRIP_DATA_NULL_RECORDS"
-  database  = "INBOUND_INTEGRATION"
-  schema    = "DQ_TRIP"
+  database  = snowflake_database.inbound_integration.name
+  schema    = snowflake_schema.dq_check_trip.name
+  depends_on = [
+    snowflake_schema.dq_check_trip
+  ]
   comment   = "Rows with Null values for YELLOW_TRIP_RECORDS Table"
 
   column {
@@ -105,10 +108,13 @@ resource "snowflake_table" "trip_data_null_records" {
   }
 }
 
-resource "snowflake_table" "TRIP_DATA_DUPLICATES" {
+resource "snowflake_table" "trip_data_duplicates" {
   name      = "TRIP_DATA_DUPLICATES"
-  database  = "INBOUND_INTEGRATION"
-  schema    = "DQ_TRIP"
+  database  = snowflake_database.inbound_integration.name
+  schema    = snowflake_schema.dq_check_trip.name
+  depends_on = [
+    snowflake_schema.dq_check_trip
+  ]
   comment   = "Rows with duplicate values for YELLOW_TRIP_RECORDS Table"
 
   column {
@@ -212,10 +218,13 @@ resource "snowflake_table" "TRIP_DATA_DUPLICATES" {
   }
 }
 
-resource "snowflake_table" "INVALID_TRIP_DATA" {
+resource "snowflake_table" "invalid_trip_data" {
   name      = "INVALID_TRIP_DATA"
-  database  = "INBOUND_INTEGRATION"
-  schema    = "DQ_TRIP"
+  database  = snowflake_database.inbound_integration.name
+  schema    = snowflake_schema.dq_check_trip.name
+  depends_on = [
+    snowflake_schema.dq_check_trip
+  ]
   comment   = "Rows with junk values for YELLOW_TRIP_RECORDS Table"
 
   column {
@@ -321,8 +330,11 @@ resource "snowflake_table" "INVALID_TRIP_DATA" {
 
 resource "snowflake_table" "weather_null_records" {
   name      = "WEATHER_NULL_RECORDS"
-  database  = "INBOUND_INTEGRATION"
-  schema    = "DQ_WEATHER"
+  database  = snowflake_database.inbound_integration.name
+  schema    = snowflake_schema.dq_check_weather.name
+  depends_on = [
+    snowflake_schema.dq_check_weather
+  ]
   comment   = "Null records for key columns from NYC Weather Data Table - unpivoted"
 
   column {
@@ -351,10 +363,13 @@ resource "snowflake_table" "weather_null_records" {
   }
 }
 
-resource "snowflake_table" "WEATHER_DATA_DUPLICATES" {
+resource "snowflake_table" "weather_data_duplicates" {
   name      = "WEATHER_DATA_DUPLICATES"
-  database  = "INBOUND_INTEGRATION"
-  schema    = "DQ_WEATHER"
+  database  = snowflake_database.inbound_integration.name
+  schema    = snowflake_schema.dq_check_weather.name
+  depends_on = [
+    snowflake_schema.dq_check_weather
+  ]
   comment   = "Duplicate records for key columns from NYC Weather Data Table - unpivoted"
 
   column {
@@ -383,10 +398,13 @@ resource "snowflake_table" "WEATHER_DATA_DUPLICATES" {
   }
 }
 
-resource "snowflake_table" "INVALID_WEATHER_DATA" {
+resource "snowflake_table" "invalid_weather_data" {
   name      = "INVALID_WEATHER_DATA"
-  database  = "INBOUND_INTEGRATION"
-  schema    = "DQ_WEATHER"
+  database  = snowflake_database.inbound_integration.name
+  schema    = snowflake_schema.dq_check_weather.name
+  depends_on = [
+    snowflake_schema.dq_check_weather
+  ]
   comment   = "Junk records for key columns from NYC Weather Data Table - unpivoted"
 
   column {
