@@ -142,3 +142,60 @@ resource "snowflake_table" "weather_data_sds" {
     type = "STRING"
   }
 }
+
+resource "snowflake_table" "weather_data_pivoted" {
+  name      = "WEATHER_DATA_PIVOTED"
+  database  = snowflake_database.inbound_integration.name
+  schema    = snowflake_schema.staging_weather.name
+
+  depends_on = [
+    snowflake_schema.staging_weather
+  ]
+
+  comment = "Pivoted weather dataset retained after transformation"
+
+  column { 
+    name = "ODate" 
+    type = "DATE" 
+    }
+  column { 
+    name = "Tmin" 
+    type = "FLOAT" 
+    }
+  column {
+    name = "Tmax" 
+    type = "FLOAT" 
+    }
+  column {
+    name = "Prcp" 
+    type = "FLOAT" 
+    }
+  column { 
+    name = "Snow" 
+    type = "FLOAT" 
+    }
+  column { 
+    name = "Snwd" 
+    type = "FLOAT" 
+    }
+  column { 
+    name = "Awnd" 
+    type = "FLOAT" 
+    }
+  column { 
+    name = "Wsf2" 
+    type = "FLOAT" 
+    }
+  column { 
+    name = "Wdf2" 
+    type = "FLOAT" 
+    }
+  column { 
+    name = "Wsf5" 
+    type = "FLOAT" 
+    }
+  column { 
+    name = "Wdf5" 
+    type = "FLOAT" 
+    }
+}

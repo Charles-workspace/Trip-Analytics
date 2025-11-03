@@ -18,6 +18,8 @@ def main():
     df_weather = session.table(config.raw_weather_data)
     
     weather_df = pivot_weather_table() 
+    weather_df.write.mode("overwrite").save_as_table(config.pivoted_weather_table)
+
     trip_df = trip_records_transformer()
 
     dq = DQCheck(session, config.trip_key_cols, config.dq_table_name)
