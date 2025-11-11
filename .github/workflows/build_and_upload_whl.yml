@@ -64,4 +64,4 @@ jobs:
         run: |
           WHEEL_FILE=$(ls $WHEEL_DIR/*.whl | head -n 1)
           echo "Uploading $WHEEL_FILE to @$STAGE_NAME ..."
-          snow stage put "$WHEEL_FILE" "@$STAGE_NAME" --overwrite
+          snow stage copy "$WHEEL_FILE" "@$STAGE_NAME" --overwrite
