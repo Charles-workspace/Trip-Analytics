@@ -1,6 +1,6 @@
 from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col,min,to_date
-from src.configs.connection_config import connection_parameters
+from src.trip_pipeline.configs.connection_config import connection_parameters
 
 valid_weather_data = "INBOUND_INTEGRATION.SDS_WEATHER.WEATHER_DATA_VALIDATED"
 
