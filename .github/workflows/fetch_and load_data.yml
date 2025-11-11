@@ -87,7 +87,7 @@ jobs:
             --role "$SF_ROLE" \
             --database "$SF_DATABASE" \
             --schema "$SF_SCHEMA" \
-            --authenticator snowflake \
+            --authenticator SNOWFLAKE_JWT \
             --no-interactive \
             --default
 
