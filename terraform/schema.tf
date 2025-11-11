@@ -69,3 +69,12 @@ resource "snowflake_schema" "spcs_deployment" {
   ]
   comment  = "Schema for storing docker images"
 }
+
+resource "snowflake_schema" "proc" {
+  name     = "PROC"
+  database = snowflake_database.ops.name
+  depends_on = [
+    snowflake_database.ops
+  ]
+  comment  = "Schema for stored procedure"
+}
