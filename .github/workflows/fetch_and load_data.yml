@@ -1,0 +1,138 @@
+name: Fetch NOAA Weather + Load to Snowflake
+
+on:
+  workflow_dispatch:
+    inputs:
+      start_date:
+        description: "Start date (YYYY-MM-DD)"
+        required: true
+      end_date:
+        description: "End date (YYYY-MM-DD)"
+        required: true
+      sf_database:
+        description: "Snowflake database"
+        default: "INBOUND_INTEGRATION"
+        required: true
+      sf_schema:
+        description: "Snowflake schema"
+        default: "LANDING_WEATHER"
+        required: true
+      sf_stage:
+        description: "Stage for weather files"
+        default: "INBOUND_INTEGRATION.LANDING_WEATHER.LANDING_WEATHER_STAGE"
+        required: true
+      sf_warehouse:
+        description: "Warehouse to use"
+        default: "WH_DBT"
+        required: true
+
+jobs:
+  fetch-weather:
+    runs-on: ubuntu-latest
+
+    # Single source of truth for env/inputs/secrets
+    env:
+      # Inputs
+      START_DATE: ${{ github.event.inputs.start_date }}
+      END_DATE:   ${{ github.event.inputs.end_date }}
+      SF_DATABASE: ${{ github.event.inputs.sf_database }}
+      SF_SCHEMA:   ${{ github.event.inputs.sf_schema }}
+      SF_STAGE:    ${{ github.event.inputs.sf_stage }}
+      SF_WAREHOUSE: ${{ github.event.inputs.sf_warehouse }}
+
+      # Secrets (use your existing names)
+      SF_ACCOUNT:  ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
+      SF_USER:     ${{ secrets.SNOWFLAKE_USER }}
+      SF_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      SF_ROLE:     ${{ secrets.SNOWFLAKE_ROLE }}
+      NOAA_TOKEN:  ${{ secrets.NOAA_TOKEN }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: (Optional) Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt || pip install pandas requests snowflake-connector-python
+
+      - name: Fetch NOAA weather (JSON -> CSV)
+        run: |
+          python pipeline/fetch_noaa_weather.py "$START_DATE" "$END_DATE"
+
+      - name: Set up Snowflake CLI
+        uses: snowflakedb/snowflake-cli-action@v2.0
+        with:
+          cli-version: "3.11.0"
+
+      - name: Add Snowflake connection (default)
+        run: |
+          snow connection add \
+            --connection-name github_ci_connection \
+            --accountname "$SF_ACCOUNT" \
+            --username "$SF_USER" \
+            --password "$SF_PASSWORD" \
+            --role "$SF_ROLE" \
+            --database "$SF_DATABASE" \
+            --schema "$SF_SCHEMA" \
+            --authenticator snowflake \
+            --no-interactive \
+            --default
+
+      - name: Upload CSV to stage
+        run: |
+          # pick the most recent CSV produced by the fetch step
+          FILEPATH=$(ls -t data/*.csv | head -n 1)
+          echo "Uploading $FILEPATH to @$SF_STAGE"
+          snow stage put "$FILEPATH" "@$SF_STAGE" --auto-compress
+
+      - name: Copy weather data into Snowflake landing table
+        run: |
+            snow sql -q "
+            COPY INTO ${SF_DATABASE}.${SF_SCHEMA}.NYC_WEATHER 
+            FROM @${SF_DATABASE}.${SF_SCHEMA}.LANDING_WEATHER_STAGE
+            FILE_FORMAT = (
+            TYPE = 'CSV'
+            FIELD_OPTIONALLY_ENCLOSED_BY='\"'
+            SKIP_HEADER=1
+            );"
+
+      - name: Upload trip data source files
+        run: |
+          echo "Uploading yellow_tripdata_2025-05.parquet and taxi_zone_lookup.csv to @INBOUND_INTEGRATION.LANDING_TRIP.LANDING_TRIP_STAGE"
+          snow stage put source_data/yellow_tripdata_2025-05.parquet @INBOUND_INTEGRATION.LANDING_TRIP.LANDING_TRIP_STAGE --auto-compress
+          snow stage put source_data/taxi_zone_lookup.csv @INBOUND_INTEGRATION.LANDING_TRIP.LANDING_TRIP_STAGE --auto-compress
+
+      - name: Copy Parquet trip data into Snowflake
+        run: |
+          snow sql -q "
+          COPY INTO INBOUND_INTEGRATION.LANDING_TRIP.YELLOW_TRIP_RECORDS
+          FROM @INBOUND_INTEGRATION.LANDING_TRIP.LANDING_TRIP_STAGE
+          FILE_FORMAT = (TYPE = 'PARQUET')
+          MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
+          PATTERN = '.*yellow_tripdata_2025-05\\.parquet.*';"
+
+      - name: Copy taxi zone lookup CSV into Snowflake
+        run: |
+          snow sql -q "
+          COPY INTO INBOUND_INTEGRATION.LANDING_TRIP.TAXI_ZONE_LOOKUP
+          FROM @INBOUND_INTEGRATION.LANDING_TRIP.LANDING_TRIP_STAGE
+          FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY='\"' PARSE_HEADER=TRUE)
+          MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
+          PATTERN = '.*taxi_zone_lookup\\.csv.*';"
+
+      - name: Trigger stored procedure (with dates)
+        run: |
+          snow sql -q "CALL OPS.PROC.RUN_TRIP_PIPELINE('$START_DATE','$END_DATE');"

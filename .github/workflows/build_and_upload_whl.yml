@@ -35,7 +35,7 @@ jobs:
       - name: Build wheel
         run: |
           python -m build
-          echo "Built wheel(s):"
+          echo "Built wheel:"
           ls -lh dist/
 
       - name: Set up Snowflake CLI
