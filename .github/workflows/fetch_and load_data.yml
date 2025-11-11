@@ -96,7 +96,7 @@ jobs:
           # pick the most recent CSV produced by the fetch step
           FILEPATH=$(ls -t data/*.csv | head -n 1)
           echo "Uploading $FILEPATH to @$SF_STAGE"
-          snow stage put "$FILEPATH" "@$SF_STAGE" --auto-compress
+          snow stage copy "$FILEPATH" "@$SF_STAGE" --auto-compress
 
       - name: Copy weather data into Snowflake landing table
         run: |
@@ -112,8 +112,8 @@ jobs:
       - name: Upload trip data source files
         run: |
           echo "Uploading yellow_tripdata_2025-05.parquet and taxi_zone_lookup.csv to @INBOUND_INTEGRATION.LANDING_TRIP.LANDING_TRIP_STAGE"
-          snow stage put source_data/yellow_tripdata_2025-05.parquet @INBOUND_INTEGRATION.LANDING_TRIP.LANDING_TRIP_STAGE --auto-compress
-          snow stage put source_data/taxi_zone_lookup.csv @INBOUND_INTEGRATION.LANDING_TRIP.LANDING_TRIP_STAGE --auto-compress
+          snow stage copy source_data/yellow_tripdata_2025-05.parquet @INBOUND_INTEGRATION.LANDING_TRIP.LANDING_TRIP_STAGE --auto-compress
+          snow stage copy source_data/taxi_zone_lookup.csv @INBOUND_INTEGRATION.LANDING_TRIP.LANDING_TRIP_STAGE --auto-compress
 
       - name: Copy Parquet trip data into Snowflake
         run: |
