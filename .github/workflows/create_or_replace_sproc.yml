@@ -1,0 +1,42 @@
+name: Deploy Stored Procedure
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  create-sproc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Snowflake CLI
+        uses: snowflakedb/snowflake-cli-action@v2.0
+
+      - name: Configure Snowflake connection
+        run: |
+          echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY_BASE64 }}" | base64 --decode > snowflake_key.pem
+          chmod 600 snowflake_key.pem
+          snow connection add \
+            --connection-name github_ci_connection \
+            --accountname "${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}" \
+            --username "${{ secrets.SNOWFLAKE_USER }}" \
+            --private-key-path snowflake_key.pem \
+            --role "${{ secrets.SNOWFLAKE_ROLE }}" \
+            --database OPS \
+            --schema PROC \
+            --no-interactive \
+            --default
+
+      - name: Create or Replace Stored Procedure
+        run: |
+          snow sql -q "
+          CREATE OR REPLACE PROCEDURE OPS.PROC.RUN_TRIP_PIPELINE(start_date STRING, end_date STRING)
+          RETURNS STRING
+          LANGUAGE PYTHON
+          RUNTIME_VERSION = '3.10'
+          PACKAGES = ('snowflake-snowpark-python','pandas','requests')
+          IMPORTS = ('@OPS.PROC.PROC_STAGE/trip_pipeline-0.1.0-py3-none-any.whl')
+          HANDLER = 'trip_pipeline.proc_wrapper.run_pipeline';
+          "
