@@ -1,5 +1,9 @@
 from src.trip_pipeline.dq.dq_check import DQCheck
 from unittest.mock import MagicMock,patch
+import importlib,pytest
+
+def dq_module_path():
+    return importlib.import_module("trip_pipeline.dq.dq_check").__name__
 
 
 # Test case 1: Test null_check with rows containing null/empty values in key columns
@@ -46,7 +50,7 @@ def test_null_check():
     mock_invalid_df.write = mock_write
 
 
-    with patch("dq.dq_check.DQCheck.build_null_condition") as mock_build_condition:
+    with patch(f"{dq_module_path()}.DQCheck.build_null_condition") as mock_build_condition:
         mock_condition = MagicMock(name="condition")
         mock_build_condition.return_value = mock_condition
         count, valid_df = dq.null_check(mock_df, dq_table)
@@ -105,7 +109,7 @@ def test_null_check_no_nulls():
     mock_invalid_df.write = mock_write
 
 
-    with patch("dq.dq_check.DQCheck.build_null_condition") as mock_build_condition:
+    with patch(f"{dq_module_path()}.DQCheck.build_null_condition") as mock_build_condition:
         mock_condition = MagicMock(name="condition")
         mock_build_condition.return_value = mock_condition
         count, valid_df = dq.null_check(mock_df, dq_table)
@@ -236,9 +240,9 @@ def test_junk_value_check_with_junk():
     mock_clean_df.count.return_value = 3
 
     # Patch the try_cast and col used inside the method
-    with patch("dq.dq_check.col", side_effect=lambda x: x), \
-         patch("dq.dq_check.trim", side_effect=lambda x: x), \
-         patch("dq.dq_check.try_cast", side_effect=lambda x, _: x):
+    with patch(f"{dq_module_path()}.col", side_effect=lambda x: x), \
+         patch(f"{dq_module_path()}.trim", side_effect=lambda x: x), \
+         patch(f"{dq_module_path()}.try_cast", side_effect=lambda x, _: x):
 
         junk_df, clean_df = dq.junk_value_check(mock_df, key_columns, dtype, min_valid_epoch)
 
@@ -268,9 +272,9 @@ def test_junk_value_check_no_junk():
     mock_junk_df.count.return_value = 0
     mock_clean_df.count.return_value = 5
 
-    with patch("dq.dq_check.col", side_effect=lambda x: x), \
-         patch("dq.dq_check.trim", side_effect=lambda x: x), \
-         patch("dq.dq_check.try_cast", side_effect=lambda x, _: x):
+    with patch(f"{dq_module_path()}.col", side_effect=lambda x: x), \
+         patch(f"{dq_module_path()}.trim", side_effect=lambda x: x), \
+         patch(f"{dq_module_path()}.try_cast", side_effect=lambda x, _: x):
 
         junk_df, clean_df = dq.junk_value_check(mock_df, key_columns, dtype, min_valid_epoch)
 
@@ -297,9 +301,9 @@ def test_weather_junk_val_check_timestamp_junk():
     mock_junk_df.count.return_value = 1
     mock_clean_df.count.return_value = 5
 
-    with patch("dq.dq_check.col", side_effect=lambda x: x), \
-         patch("dq.dq_check.trim", side_effect=lambda x: x), \
-         patch("dq.dq_check.try_cast", side_effect=lambda x, _: x):
+    with patch(f"{dq_module_path()}.col", side_effect=lambda x: x), \
+         patch(f"{dq_module_path()}.trim", side_effect=lambda x: x), \
+         patch(f"{dq_module_path()}.try_cast", side_effect=lambda x, _: x):
 
         junk_df, clean_df = dq.weather_junk_val_check(mock_df, columns, dtype, weather_data_types)
 
@@ -326,9 +330,9 @@ def test_weather_junk_val_check_datatype_junk():
     mock_junk_df.count.return_value = 2
     mock_clean_df.count.return_value = 4
 
-    with patch("dq.dq_check.col", side_effect=lambda x: x), \
-         patch("dq.dq_check.trim", side_effect=lambda x: x), \
-         patch("dq.dq_check.try_cast", side_effect=lambda x, _: x):  # still patch just in case
+    with patch(f"{dq_module_path()}.col", side_effect=lambda x: x), \
+         patch(f"{dq_module_path()}.trim", side_effect=lambda x: x), \
+         patch(f"{dq_module_path()}.try_cast", side_effect=lambda x, _: x):  # still patch just in case
 
         junk_df, clean_df = dq.weather_junk_val_check(mock_df, columns, dtype, weather_data_types)
 
@@ -352,10 +356,10 @@ def test_weather_junk_val_check_with_junk_timestamps():
     mock_junk_df.count.return_value = 2
     mock_clean_df.count.return_value = 3
 
-    with patch("dq.dq_check.trim", side_effect=lambda col_obj: col_obj), \
-         patch("dq.dq_check.col", side_effect=lambda x: f"col({x})"), \
-         patch("dq.dq_check.try_cast", side_effect=lambda col_obj, dtype: f"casted({col_obj})"), \
-         patch("dq.dq_check.TimestampType"):  # dummy patch to avoid errors
+    with patch(f"{dq_module_path()}.trim", side_effect=lambda col_obj: col_obj), \
+         patch(f"{dq_module_path()}.col", side_effect=lambda x: f"col({x})"), \
+         patch(f"{dq_module_path()}.try_cast", side_effect=lambda col_obj, dtype: f"casted({col_obj})"), \
+         patch(f"{dq_module_path()}.TimestampType"):  # dummy patch to avoid errors
          
         junk_df, clean_df = dq.weather_junk_val_check(mock_df, ['date'], "timestamp_type", [])
 
@@ -379,10 +383,10 @@ def test_weather_junk_val_check_no_junk_timestamps():
     mock_junk_df.count.return_value = 0
     mock_clean_df.count.return_value = 5
 
-    with patch("dq.dq_check.trim", side_effect=lambda col_obj: col_obj), \
-         patch("dq.dq_check.col", side_effect=lambda x: f"col({x})"), \
-         patch("dq.dq_check.try_cast", side_effect=lambda col_obj, dtype: f"casted({col_obj})"), \
-         patch("dq.dq_check.TimestampType"):
+    with patch(f"{dq_module_path()}.trim", side_effect=lambda col_obj: col_obj), \
+         patch(f"{dq_module_path()}.col", side_effect=lambda x: f"col({x})"), \
+         patch(f"{dq_module_path()}.try_cast", side_effect=lambda col_obj, dtype: f"casted({col_obj})"), \
+         patch(f"{dq_module_path()}.TimestampType"):
         
         junk_df, clean_df = dq.weather_junk_val_check(mock_df, ['date'], "timestamp_type", [])
 

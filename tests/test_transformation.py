@@ -12,9 +12,9 @@ os.environ["SNOWFLAKE_ROLE"] = "dummy_role"
 from unittest.mock import MagicMock, patch
 from src.trip_pipeline.transform.trip_data_transformer import trip_records_transformer
 
-@patch("src.transform.trip_data_transformer.to_date")
-@patch("src.transform.trip_data_transformer.to_timestamp")
-@patch("src.transform.trip_data_transformer.Session")
+@patch("src.trip_pipeline.transform.trip_data_transformer.to_date")
+@patch("src.trip_pipeline.transform.trip_data_transformer.to_timestamp")
+@patch("src.trip_pipeline.transform.trip_data_transformer.Session")
 def test_trip_records_transformer(mock_session_class, mock_to_timestamp, mock_to_date):
     # Setup mock session and mock table return
     mock_session = MagicMock()
@@ -60,11 +60,11 @@ def test_pivot_weather_table():
     
     fake_datatypes = [("TMIN",), ("TMAX",), ("PRCP",)]  # simulate .collect() returning a list of tuples
 
-    with patch("src.transform.weather_data_transformer.Session") as mock_session_class, \
-     patch("src.transform.weather_data_transformer.connection_parameters", SimpleNamespace(mock_key="mock_val")), \
-     patch("src.transform.weather_data_transformer.min") as mock_min, \
-     patch("src.transform.weather_data_transformer.col") as mock_col, \
-     patch("src.transform.weather_data_transformer.to_date") as mock_to_date:
+    with patch("src.trip_pipeline.transform.weather_data_transformer.Session") as mock_session_class, \
+     patch("src.trip_pipeline.transform.weather_data_transformer.connection_parameters", SimpleNamespace(mock_key="mock_val")), \
+     patch("src.trip_pipeline.transform.weather_data_transformer.min") as mock_min, \
+     patch("src.trip_pipeline.transform.weather_data_transformer.col") as mock_col, \
+     patch("src.trip_pipeline.transform.weather_data_transformer.to_date") as mock_to_date:
 
         # Patch the session and data retrieval
         mock_session_class.builder.configs.return_value.create.return_value = mock_session
