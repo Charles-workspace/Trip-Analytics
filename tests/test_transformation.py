@@ -10,7 +10,7 @@ os.environ["SNOWFLAKE_ROLE"] = "dummy_role"
 
 
 from unittest.mock import MagicMock, patch
-from src.transform.trip_data_transformer import trip_records_transformer
+from src.trip_pipeline.transform.trip_data_transformer import trip_records_transformer
 
 @patch("src.transform.trip_data_transformer.to_date")
 @patch("src.transform.trip_data_transformer.to_timestamp")
@@ -48,7 +48,7 @@ def test_trip_records_transformer(mock_session_class, mock_to_timestamp, mock_to
 
 
 from unittest.mock import MagicMock, patch
-from src.transform.weather_data_transformer import pivot_weather_table
+from src.trip_pipeline.transform.weather_data_transformer import pivot_weather_table
 
 def test_pivot_weather_table():
     # Mock all external dependencies

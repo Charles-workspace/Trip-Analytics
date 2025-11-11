@@ -1,4 +1,4 @@
-from src.dq.dq_check import DQCheck
+from src.trip_pipeline.dq.dq_check import DQCheck
 from unittest.mock import MagicMock,patch
 
 
