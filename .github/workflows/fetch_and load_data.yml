@@ -43,7 +43,6 @@ jobs:
       # Secrets (use your existing names)
       SF_ACCOUNT:  ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
       SF_USER:     ${{ secrets.SNOWFLAKE_USER }}
-      SF_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
       SF_ROLE:     ${{ secrets.SNOWFLAKE_ROLE }}
       NOAA_TOKEN:  ${{ secrets.NOAA_TOKEN }}
 
@@ -79,11 +78,14 @@ jobs:
 
       - name: Add Snowflake connection (default)
         run: |
+          echo "$PRIVATE_KEY_BASE64" | base64 --decode > snowflake_key.pem
+          chmod 600 snowflake_key.pem
+          
           snow connection add \
             --connection-name github_ci_connection \
             --accountname "$SF_ACCOUNT" \
             --username "$SF_USER" \
-            --password "$SF_PASSWORD" \
+            --private-key-file snowflake_key.pem \
             --role "$SF_ROLE" \
             --database "$SF_DATABASE" \
             --schema "$SF_SCHEMA" \
