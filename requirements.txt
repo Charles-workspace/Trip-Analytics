@@ -1,3 +1,6 @@
 pytest
 snowflake-snowpark-python
 python-dotenv
+pandas
+requests
+snowflake-connector-python
