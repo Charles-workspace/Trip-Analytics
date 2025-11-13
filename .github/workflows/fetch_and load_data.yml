@@ -70,7 +70,7 @@ jobs:
 
       - name: Fetch NOAA weather (JSON -> CSV)
         run: |
-          python pipeline/fetch_noaa_weather.py "$START_DATE" "$END_DATE"
+          python weather_data_extraction/fetch_weather_data.py "$START_DATE" "$END_DATE"
 
       - name: Set up Snowflake CLI
         uses: snowflakedb/snowflake-cli-action@v2.0
