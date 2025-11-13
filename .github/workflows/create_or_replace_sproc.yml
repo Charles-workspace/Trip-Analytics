@@ -22,7 +22,7 @@ jobs:
             --connection-name github_ci_connection \
             --accountname "${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}" \
             --username "${{ secrets.SNOWFLAKE_USER }}" \
-            --private-key-path snowflake_key.pem \
+            --private-key-file snowflake_key.pem \
             --role "${{ secrets.SNOWFLAKE_ROLE }}" \
             --database OPS \
             --schema PROC \
