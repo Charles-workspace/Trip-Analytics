@@ -26,14 +26,15 @@ class Tableconfig:
 
 config = Tableconfig(
 trip_key_cols = ['"VendorID"', '"tpep_pickup_datetime"', '"tpep_dropoff_datetime"', '"PULocationID"', '"DOLocationID"'],
-weather_key_cols = ['DATE', 'DATATYPE'],
 weather_data_types = ["AWND", "WT01", "WSF5", "WSF2", "WDF5", "WDF2", "TMIN", "TMAX", "SNWD", "PRCP", "WT08", "SNOW", "WT03", "WT02"],
 
 trip_ts_columns = ['"tpep_pickup_datetime"', '"tpep_dropoff_datetime"'],
 trip_int_columns = ['"VendorID"', '"PULocationID"', '"DOLocationID"'],
 
-weather_ts_columns = ['date'],
-weather_data_columns = ['datatype'],
+
+weather_ts_columns = ["DATE"]
+weather_data_columns = ["DATATYPE"]
+weather_key_cols = ["DATE", "DATATYPE"]
 
 
 dq_table_name="INBOUND_INTEGRATION.DQ_TRIP.TRIP_DATA_NULL_RECORDS",
