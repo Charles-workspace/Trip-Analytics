@@ -26,6 +26,7 @@ jobs:
             --role "${{ secrets.SNOWFLAKE_ROLE }}" \
             --database OPS \
             --schema PROC \
+            --authenticator SNOWFLAKE_JWT \
             --no-interactive \
             --default
 
