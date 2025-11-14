@@ -17,7 +17,7 @@ def pivot_weather_table(session,valid_weather_data):
     )
 
 
-    pivoted_df=pivoted_df.with_column('"ODate"',to_date(col("DATE"))
+    pivoted_df=pivoted_df.with_column('"ODate"',to_date(col('"date"'))
                                     ).with_column_renamed("'TMIN'",'"Tmin"'
                                     ).with_column_renamed("'TMAX'",'"Tmax"'
                                     ).with_column_renamed("'PRCP'",'"Prcp"'
