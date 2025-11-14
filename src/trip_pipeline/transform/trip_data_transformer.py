@@ -1,6 +1,6 @@
 from snowflake.snowpark import Session
 from snowflake.snowpark.functions import to_timestamp,to_date
-from src.trip_pipeline.configs.connection_config import connection_parameters
+from trip_pipeline.configs.connection_config import connection_parameters
 
 valid_trip_data="INBOUND_INTEGRATION.SDS_TRIP.TRIP_DATA_VALIDATED"
 

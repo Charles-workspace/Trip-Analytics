@@ -1,11 +1,11 @@
 
 from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col, lit, concat_ws
-from src.trip_pipeline.transform.trip_data_transformer import trip_records_transformer
-from src.trip_pipeline.transform.weather_data_transformer import pivot_weather_table
-from src.trip_pipeline.dq.dq_check import DQCheck
-from src.trip_pipeline.configs.data_objects import config
-from src.trip_pipeline.configs.connection_config import connection_parameters
+from trip_pipeline.transform.trip_data_transformer import trip_records_transformer
+from trip_pipeline.transform.weather_data_transformer import pivot_weather_table
+from trip_pipeline.dq.dq_check import DQCheck
+from trip_pipeline.configs.data_objects import config
+from trip_pipeline.configs.connection_config import connection_parameters
 from pathlib import Path
 import os
 
