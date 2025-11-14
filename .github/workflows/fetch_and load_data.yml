@@ -45,6 +45,7 @@ jobs:
       SF_USER:     ${{ secrets.SNOWFLAKE_USER }}
       SF_ROLE:     ${{ secrets.SNOWFLAKE_ROLE }}
       NOAA_TOKEN:  ${{ secrets.NOAA_TOKEN }}
+      PRIVATE_KEY_BASE64: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_BASE64 }}
 
     steps:
       - name: Checkout repo
