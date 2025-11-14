@@ -32,9 +32,9 @@ trip_ts_columns = ['"tpep_pickup_datetime"', '"tpep_dropoff_datetime"'],
 trip_int_columns = ['"VendorID"', '"PULocationID"', '"DOLocationID"'],
 
 
-weather_ts_columns = ["DATE"]
-weather_data_columns = ["DATATYPE"]
-weather_key_cols = ["DATE", "DATATYPE"]
+weather_ts_columns = ["DATE"],
+weather_data_columns = ["DATATYPE"],
+weather_key_cols = ["DATE", "DATATYPE"],
 
 
 dq_table_name="INBOUND_INTEGRATION.DQ_TRIP.TRIP_DATA_NULL_RECORDS",
