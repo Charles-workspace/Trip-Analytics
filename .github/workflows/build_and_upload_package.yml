@@ -1,16 +1,16 @@
-name: Build and Upload Wheel to Snowflake
+name: Build and Upload Package to Snowflake
 
 on:
   workflow_dispatch: {}
 
 jobs:
-  build-and-upload-wheel:
-    name: Build wheel and upload to Snowflake stage
+  build-and-upload-package:
+    name: Build package and upload to Snowflake stage
     runs-on: ubuntu-latest
 
     env:
       PACKAGE_NAME: trip_pipeline
-      WHEEL_DIR: dist
+      ZIP_DIR: package
       STAGE_NAME: OPS.PROC.PROC_STAGE
       SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
       SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
