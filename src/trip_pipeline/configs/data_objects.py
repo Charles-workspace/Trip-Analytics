@@ -25,16 +25,16 @@ class Tableconfig:
     final_table: str
 
 config = Tableconfig(
-trip_key_cols = ['"VendorID"', '"tpep_pickup_datetime"', '"tpep_dropoff_datetime"', '"PULocationID"', '"DOLocationID"'],
+trip_key_cols = ["VendorID", "tpep_pickup_datetime", "tpep_dropoff_datetime", "PULocationID", "DOLocationID"],
 weather_data_types = ["AWND", "WT01", "WSF5", "WSF2", "WDF5", "WDF2", "TMIN", "TMAX", "SNWD", "PRCP", "WT08", "SNOW", "WT03", "WT02"],
 
-trip_ts_columns = ['"tpep_pickup_datetime"', '"tpep_dropoff_datetime"'],
-trip_int_columns = ['"VendorID"', '"PULocationID"', '"DOLocationID"'],
+trip_ts_columns = ["tpep_pickup_datetime", "tpep_dropoff_datetime"],
+trip_int_columns = ["VendorID", "PULocationID", "DOLocationID"],
 
 
-weather_ts_columns = ['"date"'],
-weather_data_columns = ['"datatype"'],
-weather_key_cols = ['"date"', '"datatype"'],
+weather_ts_columns = ["date"],
+weather_data_columns = ["datatype"],
+weather_key_cols = ["date", "datatype"],
 
 
 dq_table_name="INBOUND_INTEGRATION.DQ_TRIP.TRIP_DATA_NULL_RECORDS",

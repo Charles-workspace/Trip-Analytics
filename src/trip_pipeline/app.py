@@ -73,19 +73,19 @@ def main(session):
 
 
     join_df = trip_df.join(z_pickup,
-                        trip_df['"PULocationID"']==z_pickup["Pu_location_id"]
+                        trip_df["PULocationID"]==z_pickup["Pu_location_id"]
                         ).join(z_drop,
-                               trip_df['"DOLocationID"']==z_drop["do_location_id"]
+                               trip_df["DOLocationID"]==z_drop["do_location_id"]
                                ).join(weather_df,
-                                      trip_df['"RideDate"'] == weather_df['"ODate"'])
+                                      trip_df["RideDate"] == weather_df["ODate"])
 
-    final_df= join_df.with_column('"PickupAddress"',
-                                  concat_ws(lit(','),join_df["pu_zone"],join_df["pu_borough"])
-                                  ).with_column('"DropAddress"',
-                                                concat_ws(lit(','),join_df["do_zone"],join_df["do_borough"]))
+    final_df= join_df.with_column("PickupAddress",
+                                  concat_ws(lit(","),join_df["pu_zone"],join_df["pu_borough"])
+                                  ).with_column("DropAddress",
+                                                concat_ws(lit(","),join_df["do_zone"],join_df["do_borough"]))
 
 
-    final_df=final_df.select('"VendorID"','"PickupAddress"','"DropAddress"','"PickupTime"','"DropoffTime"','"TripDistance"','"TotalAmount"','"Tmin"','"Tmax"','"Prcp"','"Snow"','"Snwd"','"Awnd"','"Wsf2"','"Wdf2"','"Wsf5"','"Wdf5"')
+    final_df=final_df.select("VendorID","PickupAddress","DropAddress","PickupTime","DropoffTime","TripDistance","TotalAmount","Tmin","Tmax","Prcp","Snow","Snwd","Awnd","Wsf2","Wdf2","Wsf5","Wdf5")
     final_df.write.mode("overwrite").saveAsTable(config.final_table)
 
 if __name__ == "__main__":
