@@ -34,8 +34,8 @@ jobs:
 
       - name: Build ZIP for Snowflake
         run: |
-          mkdir -p package
-          cp -R src/trip_pipeline package/trip_pipeline
+          mkdir -p package/trip_pipeline
+          rsync -av --exclude="__pycache__" src/trip_pipeline/ package/trip_pipeline/
           cd package
           zip -r trip_pipeline.zip trip_pipeline
           echo "Built ZIP package:"
