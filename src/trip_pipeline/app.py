@@ -1,26 +1,23 @@
 
-from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col, lit, concat_ws
 from trip_pipeline.transform.trip_data_transformer import trip_records_transformer
 from trip_pipeline.transform.weather_data_transformer import pivot_weather_table
 from trip_pipeline.dq.dq_check import DQCheck
 from trip_pipeline.configs.data_objects import config
-from trip_pipeline.configs.connection_config import connection_parameters
 from pathlib import Path
 import os
 
 
-def main():
+def main(session):
 
-    session = Session.builder.configs(vars(connection_parameters)).create()
 
     df_trip_orig = session.table(config.raw_trip_data)
     df_weather = session.table(config.raw_weather_data)
     
-    weather_df = pivot_weather_table() 
+    weather_df = pivot_weather_table(session) 
     weather_df.write.mode("overwrite").save_as_table(config.pivoted_weather_table)
 
-    trip_df = trip_records_transformer()
+    trip_df = trip_records_transformer(session)
 
     dq = DQCheck(session, config.trip_key_cols, config.dq_table_name)
 

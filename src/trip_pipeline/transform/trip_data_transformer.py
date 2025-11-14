@@ -1,11 +1,10 @@
-from snowflake.snowpark import Session
+
 from snowflake.snowpark.functions import to_timestamp,to_date
-from trip_pipeline.configs.connection_config import connection_parameters
 
 valid_trip_data="INBOUND_INTEGRATION.SDS_TRIP.TRIP_DATA_VALIDATED"
 
-def trip_records_transformer():
-    session = Session.builder.configs(vars(connection_parameters)).create()
+def trip_records_transformer(session):
+    
     df = session.table(valid_trip_data)
     
     transformed_df=(df.with_column('"PickupTime"',to_timestamp('"tpep_pickup_datetime"'))

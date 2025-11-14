@@ -1,11 +1,9 @@
-from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col,min,to_date
-from trip_pipeline.configs.connection_config import connection_parameters
 
 valid_weather_data = "INBOUND_INTEGRATION.SDS_WEATHER.WEATHER_DATA_VALIDATED"
 
-def pivot_weather_table():
-    session = Session.builder.configs(vars(connection_parameters)).create()
+def pivot_weather_table(session):
+    
     df = session.table(valid_weather_data)
     
     datatypes = [row[0] for row in df.select ("datatype").distinct().collect()]
@@ -13,9 +11,9 @@ def pivot_weather_table():
     #pivoted_df = df.pivot(datatypes).on("value").group_by("date").agg()
 
     pivoted_df = (
-        df.group_by("DATE")                       # <- group first
-        .pivot("datatype",datatypes)              # <- then pivot on DATATYPE values
-        .agg(min(col("VALUE")))             # <- single aggregate is fine (and typical)
+        df.group_by("DATE")                     
+        .pivot("datatype",datatypes)  
+        .agg(min(col("VALUE"))) 
     )
 
 
