@@ -1,8 +1,8 @@
 from snowflake.snowpark.functions import col,min,to_date
 
-valid_weather_data = "INBOUND_INTEGRATION.SDS_WEATHER.WEATHER_DATA_VALIDATED"
+#valid_weather_data = "INBOUND_INTEGRATION.SDS_WEATHER.WEATHER_DATA_VALIDATED"
 
-def pivot_weather_table(session):
+def pivot_weather_table(session,valid_weather_data):
     
     df = session.table(valid_weather_data)
     

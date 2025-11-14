@@ -14,8 +14,6 @@ def main(session):
     df_trip_orig = session.table(config.raw_trip_data)
     df_weather = session.table(config.raw_weather_data)
     
-    weather_df = pivot_weather_table(session) 
-    weather_df.write.mode("overwrite").save_as_table(config.pivoted_weather_table)
 
     trip_df = trip_records_transformer(session)
 
@@ -59,7 +57,8 @@ def main(session):
     df_clean_int.write.mode("overwrite").save_as_table(config.valid_weather_data)
     print (f"{df_clean_int.count()} Total valid weather data records written into {config.valid_weather_data} table")
     
-    
+    weather_df = pivot_weather_table(session,config.valid_weather_data) 
+    weather_df.write.mode("overwrite").save_as_table(config.pivoted_weather_table)
 
     z_lookup = session.table(config.zone_lookup)
     z_pickup = z_lookup.select(
