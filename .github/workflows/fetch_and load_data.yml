@@ -81,7 +81,7 @@ jobs:
         run: |
           echo "$PRIVATE_KEY_BASE64" | base64 --decode > snowflake_key.pem
           chmod 600 snowflake_key.pem
-
+          
           snow connection add \
             --connection-name github_ci_connection \
             --accountname "$SF_ACCOUNT" \
