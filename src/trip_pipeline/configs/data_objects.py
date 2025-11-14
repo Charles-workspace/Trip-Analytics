@@ -20,6 +20,7 @@ class Tableconfig:
     valid_weather_data: str
     invalid_weather_data: str
     raw_weather_data: str
+    pivoted_weather_table: str
     zone_lookup: str
     final_table: str
 
