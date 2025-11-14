@@ -38,6 +38,6 @@ jobs:
           LANGUAGE PYTHON
           RUNTIME_VERSION = '3.10'
           PACKAGES = ('snowflake-snowpark-python','pandas','requests')
-          IMPORTS = ('@OPS.PROC.PROC_STAGE/trip_pipeline-0.1.0-py3-none-any.whl')
+          IMPORTS = ('@OPS.PROC.PROC_STAGE/trip_pipeline-0.1.0-py3-none-any.whl',)
           HANDLER = 'trip_pipeline.proc_wrapper.run_pipeline';
           "
