@@ -6,14 +6,14 @@ def pivot_weather_table(session):
     
     df = session.table(valid_weather_data)
     
-    datatypes = [row[0] for row in df.select ("DATATYPE").distinct().collect()]
+    datatypes = [row[0] for row in df.select ('"datatype"').distinct().collect()]
     #print (datatypes[0])
     #pivoted_df = df.pivot(datatypes).on("value").group_by("date").agg()
 
     pivoted_df = (
-        df.group_by("DATE")                     
-        .pivot("DATATYPE",datatypes)  
-        .agg(min(col("VALUE"))) 
+        df.group_by('"date"')                     
+        .pivot('"datatype"',datatypes)  
+        .agg(min(col('"value"'))) 
     )
 
 
