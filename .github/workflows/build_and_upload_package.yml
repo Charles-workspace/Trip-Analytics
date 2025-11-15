@@ -34,6 +34,7 @@ jobs:
 
       - name: Build ZIP for Snowflake
         run: |
+          rm -rf package
           mkdir -p package/trip_pipeline
           rsync -av --exclude="__pycache__" src/trip_pipeline/ package/trip_pipeline/
           cd package
