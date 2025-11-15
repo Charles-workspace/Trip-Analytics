@@ -7,9 +7,9 @@ def trip_records_transformer(session):
     
     df = session.table(valid_trip_data)
     
-    transformed_df=(df.with_column("PickupTime",to_timestamp(col("tpep_pickup_datetime")))
-        .with_column("DropoffTime",to_timestamp(col("tpep_dropoff_datetime")))
-        .with_column("RideDate", to_date(col("tpep_pickup_datetime")))
+    transformed_df=(df#.with_column("PickupTime",to_timestamp(col("tpep_pickup_datetime")))
+        #.with_column("DropoffTime",to_timestamp(col("tpep_dropoff_datetime")))
+        #.with_column("RideDate", to_date(col("tpep_pickup_datetime")))
         .with_column_renamed("passenger_count", "PassengerCount")
         .with_column_renamed("trip_distance", "TripDistance")
         .with_column_renamed("fare_amount", "FareAmount")
