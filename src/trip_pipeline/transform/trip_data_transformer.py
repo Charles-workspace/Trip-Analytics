@@ -1,23 +1,31 @@
 
-from snowflake.snowpark.functions import to_timestamp,to_date
+from snowflake.snowpark.functions import to_timestamp,to_date,col
 
 valid_trip_data="INBOUND_INTEGRATION.SDS_TRIP.TRIP_DATA_VALIDATED"
+
+def normalize_trip_columns(df):
+    rename_map = {}
+    for c in df.columns:
+        clean = c.replace('"', '').lower()
+        rename_map[c] = clean
+
+    for old, new in rename_map.items():
+        df = df.with_column_renamed(old, new)
+
+    return df
 
 def trip_records_transformer(session):
     
     df = session.table(valid_trip_data)
+    df = normalize_trip_columns(df)
     
-    transformed_df=(df.with_column("PickupTime",to_timestamp("tpep_pickup_datetime"))
-        .with_column("DropoffTime",to_timestamp("tpep_dropoff_datetime"))
-        .with_column("RideDate", to_date("tpep_pickup_datetime"))
-        .with_column_renamed("passenger_count", "PassengerCount")
-        .with_column_renamed("trip_distance", "TripDistance")
-        .with_column_renamed("fare_amount", "FareAmount")
-        .with_column_renamed("tip_amount", "TipAmount")
-        .with_column_renamed("tolls_amount", "TollsAmount")
-        .with_column_renamed("total_amount", "TotalAmount")
-        .with_column_renamed("Airport_fee", "AirportFee")
-        .with_column_renamed("cbd_congestion_fee", "CbdCongestionFee")
+    transformed_df=(df.with_column("pickup_time",to_timestamp(col("tpep_pickup_datetime")))
+        .with_column("dropoff_time",to_timestamp(col("tpep_dropoff_datetime")))
+        .with_column("ride_date", to_date(col("tpep_pickup_datetime")))
+        .with_column_renamed("VendorID","vendor_id" )
+        .with_column_renamed("PULocationID", "pu_location_id")
+        .with_column_renamed("DOLocationID", "do_location_id")
+        .with_column_renamed("Airport_fee", "airport_fee")
         )
     
-    return transformed_df.select("VendorID","RideDate","PickupTime","DropoffTime","TripDistance","PULocationID","DOLocationID","FareAmount","TipAmount","TollsAmount","TotalAmount") 
+    return transformed_df.select("vendor_id","ride_date","pickup_time","dropoff_time","trip_distance","pu_location_id","do_location_id","fare_amount","tip_amount","tolls_amount","total_amount") 

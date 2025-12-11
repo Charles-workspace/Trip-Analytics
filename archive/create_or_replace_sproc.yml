@@ -18,6 +18,7 @@ jobs:
         run: |
           echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY_BASE64 }}" | base64 --decode > snowflake_key.pem
           chmod 600 snowflake_key.pem
+
           snow connection add \
             --connection-name github_ci_connection \
             --accountname "${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}" \
@@ -27,17 +28,27 @@ jobs:
             --database OPS \
             --schema PROC \
             --authenticator SNOWFLAKE_JWT \
-            --no-interactive \
-            --default
+            --default \
+            --no-interactive
 
       - name: Create or Replace Stored Procedure
         run: |
           snow sql -q "
-          CREATE OR REPLACE PROCEDURE OPS.PROC.RUN_TRIP_PIPELINE(start_date STRING, end_date STRING)
+          CREATE OR REPLACE PROCEDURE OPS.PROC.RUN_TRIP_PIPELINE(
+              start_date STRING,
+              end_date STRING
+          )
           RETURNS STRING
           LANGUAGE PYTHON
           RUNTIME_VERSION = '3.10'
-          PACKAGES = ('snowflake-snowpark-python','pandas','requests')
+          PACKAGES = (
+              'snowflake-snowpark-python',
+              'pandas',
+              'requests',
+              'pyarrow',
+              'pydantic'
+          )
           IMPORTS = ('@OPS.PROC.PROC_STAGE/trip_pipeline.zip')
-          HANDLER = 'trip_pipeline.proc_wrapper.run_trip_pipeline';
+          HANDLER = 'trip_pipeline.proc_wrapper.run_trip_pipeline'
+          ;
           "

@@ -21,7 +21,7 @@ response = requests.get(endpoint, headers=headers, params=params)
 if response.status_code != 200:
     raise Exception(f"NOAA API error {response.status_code} {response.text}")
 
-df = pd.json_normalize(response.json()['results'])[["date","datatype","station","attributes","value"]]
+df = pd.json_normalize(response.json()['results'])[['"date"','"datatype"','"station"','"attributes"','"value"']]
 
 os.makedirs("data", exist_ok=True)
 output = f"data/weather_{start}_{end}.csv"

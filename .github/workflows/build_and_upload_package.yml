@@ -11,6 +11,7 @@ jobs:
     env:
       PACKAGE_NAME: trip_pipeline
       ZIP_DIR: package
+      ZIP_FILE_NAME: trip_pipeline.zip
       STAGE_NAME: OPS.PROC.PROC_STAGE
       SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
       SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
@@ -20,7 +21,7 @@ jobs:
       PRIVATE_KEY_BASE64: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_BASE64 }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -28,18 +29,21 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install build tools
+      - name: Build ZIP for Snowflake Stored Procedure
         run: |
-          python -m pip install --upgrade pip build
+          mkdir -p $ZIP_DIR/$PACKAGE_NAME
 
-      - name: Build ZIP for Snowflake
-        run: |
-          mkdir -p package/trip_pipeline
-          rsync -av --exclude="__pycache__" src/trip_pipeline/ package/trip_pipeline/
-          cd package
-          zip -r trip_pipeline.zip trip_pipeline
-          echo "Built ZIP package:"
-          ls -lh
+          # Copy the package code
+          rsync -av --exclude="__pycache__" src/$PACKAGE_NAME/ $ZIP_DIR/$PACKAGE_NAME/
+
+
+          # Copy Snowflake requirements list
+          cp requirements.snowflake.txt $ZIP_DIR/
+
+          cd $ZIP_DIR
+          zip -r $ZIP_FILE_NAME .
+          echo "Created ZIP package:"
+          ls -lh $ZIP_FILE_NAME
 
       - name: Set up Snowflake CLI
         uses: snowflakedb/snowflake-cli-action@v2.0
@@ -60,11 +64,10 @@ jobs:
             --database "$SNOWFLAKE_DATABASE" \
             --schema "$SNOWFLAKE_SCHEMA" \
             --authenticator SNOWFLAKE_JWT \
-            --no-interactive \
             --default
 
       - name: Upload ZIP to Snowflake stage
         run: |
-          ZIP_FILE=package/trip_pipeline.zip
-          echo "Uploading $ZIP_FILE to @$STAGE_NAME ..."
-          snow stage copy "$ZIP_FILE" "@$STAGE_NAME" --overwrite
+          ZIP_PATH="$ZIP_DIR/$ZIP_FILE_NAME"
+          echo "Uploading $ZIP_PATH to @$STAGE_NAME/$ZIP_FILE_NAME ..."
+          snow stage copy "$ZIP_PATH" "@$STAGE_NAME/$ZIP_FILE_NAME" --overwrite
