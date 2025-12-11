@@ -61,6 +61,7 @@ jobs:
             --database "$SNOWFLAKE_DATABASE" \
             --schema "$SNOWFLAKE_SCHEMA" \
             --authenticator SNOWFLAKE_JWT \
+            --no-interactive \
             --default
 
       - name: Upload ZIP to Snowflake stage
