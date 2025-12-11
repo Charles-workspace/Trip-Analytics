@@ -36,10 +36,7 @@ jobs:
       - name: Create or Replace SP_LOAD_WEATHER_FROM_STAGE
         run: |
           snow sql -q "
-          CREATE OR REPLACE PROCEDURE OPS.PROC.SP_LOAD_WEATHER_FROM_STAGE(
-            start_date STRING,
-            end_date STRING
-          )
+          CREATE OR REPLACE PROCEDURE OPS.PROC.SP_LOAD_WEATHER_FROM_STAGE()
           RETURNS STRING
           LANGUAGE PYTHON
           RUNTIME_VERSION = '3.10'
