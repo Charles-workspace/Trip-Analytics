@@ -1,6 +1,6 @@
 # Trip Analytics
 
-This project builds and deploys a Docker-based analytics service for trip data using **Snowflake Snowpark Container Services (SPCS)**. It includes continuous integration and deployment (CI/CD) via **GitHub Actions** and leverages **SnowCLI** for secure authentication and image registry management.
+This project builds and orchestrates an analytics pipeline for trip data using **Snowflake Python Stored Procedures**. It includes continuous integration and deployment (CI/CD) via **GitHub Actions** and leverages **SnowCLI** for secure authentication.
 
 ## Input Data
 
@@ -13,15 +13,21 @@ There are two public datasets used in this project:
 
 The project aims to build a Snowpark-based ETL pipeline that combines NYC yellow taxi trip records with weather data to analyze how weather conditions impact taxi fare variations.
 
-Trip data consists of parquet files for ride records and a CSV file for taxi zone lookups. These files are uploaded to a Snowflake stage using *SnowSQL*. Weather data is retrieved through OpenWeatherMap APIs for date range corresponding to trip records. All raw data is loaded into a landing schema before transformations begin. The final processed dataset is written to Snowflake tables.
+Trip data consists of parquet files for ride records and a CSV file for taxi zone lookups. These files are uploaded to a Snowflake stage using *SnowSQL*. Weather data is retrieved programmatically from NOAA’s Climate Data API for date range corresponding to trip records. All raw data is loaded into a landing schema before transformations begin. The final processed dataset is written to Snowflake tables.
+
+## **API Integration**
+
+The weather data is sourced through a minimal API integration layer that fetches daily weather observations directly from NOAA’s API for the required date range.  
+The responses pass through Pydantic validation, basic error handling, and retry logic before being staged as CSV files for downstream processing inside Snowflake.
+
 
 ## Tools and Tech Stack
 
 - Terraform - Infrastructure-as-code to provision all Snowflake objects
 - Snowflake - Centralised cloud data platform used for staging, transformations and storage.
-- Docker - Containerization of the application for deployment.
-- Snowpark container service (SPCS) - Hosts the Docker image for deployment.
+- Snowflake Stored Procedures (Python) – Executes the full ETL pipeline inside Snowflake.
 - Github actions - Automates unit testing and deployment workflows.
+- Docker - Containerization (used earlier; retained for local execution) 
 
 ## Data Transformation
 
@@ -35,13 +41,9 @@ Trip data consists of parquet files for ride records and a CSV file for taxi zon
 5. Transformed weather and trip data are joined and filtered to retain only relevant columns, then written to a single Snowflake output table.
 
 
-## Current Limitation
-
-- The project was implemented using snowflake free-tier in which compute pool is not included. So it was not possible to execute the deployed docker image of the project. Though the project is executable in local
-
 ## Roadmap
 
-- Register as Snowpark procedure and orchestrate with snowflake task
+- Orchestrate Snowpark procedure with snowflake task
 - Implement logging
 - Package management using Poetry/ UV
 - Lynting using PyLint
@@ -53,5 +55,5 @@ Trip data consists of parquet files for ride records and a CSV file for taxi zon
 
 - The CI/CD pipeline currently:
   - Runs unit tests on Pull Requests (PRs) targeting `main`
-  - Triggers deployment to SPCS on merges to `main`
+  - Builds and deploys updated Python packages and stored procedures to Snowflake upon manual execution.
 - All Snowflake credentials and configuration values are securely managed via GitHub secrets.
