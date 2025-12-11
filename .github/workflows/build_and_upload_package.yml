@@ -65,7 +65,6 @@ jobs:
             --no-interactive \
             --default
 
-
       - name: Upload ZIP to Snowflake stage
         run: |
           ZIP_PATH="$ZIP_DIR/$ZIP_FILE_NAME"
