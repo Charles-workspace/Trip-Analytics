@@ -5,7 +5,7 @@ from trip_pipeline.transform.weather_data_transformer import pivot_weather_table
 from trip_pipeline.dq.dq_check import DQCheck
 from trip_pipeline.configs.data_objects import config
 
-from trip_pipeline.ingestion.weather_ingestion_service import fetch_and_stage_weather
+
 from trip_pipeline.utils.io_utils import copy_into_table
 
 
@@ -35,14 +35,7 @@ def main(session):
     df_clean_int.write.mode("overwrite").save_as_table(config.valid_trip_data)
     print (f"{df_clean_int.count()} Total valid trip records written into {config.valid_trip_data} table")
 
-    # Weather Fetch and Ingest
-    fetch_and_stage_weather(
-        session=session,
-        station_id=config.weather_station_id,
-        start_date=config.weather_start_date,
-        end_date=config.weather_end_date,
-        stage_name=config.weather_stage_name
-    )
+
     copy_into_table(
         session=session,
         table_name=config.raw_weather_data,
