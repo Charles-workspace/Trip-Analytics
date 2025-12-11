@@ -55,12 +55,13 @@ jobs:
           
           snow connection add \
             --connection-name github_ci_connection \
-            --accountname "$SNOWFLAKE_ACCOUNT" \
-            --username "$SNOWFLAKE_USER" \
+            --accountname nn15523.eu-central-1.aws\
+            --username ${{ env.SNOWFLAKE_USER }} \
             --private-key-file snowflake_key.pem \
-            --role "$SNOWFLAKE_ROLE" \
-            --database "$SNOWFLAKE_DATABASE" \
-            --schema "$SNOWFLAKE_SCHEMA" \
+            --role ${{ env.SNOWFLAKE_ROLE }} \
+            --database $SNOWFLAKE_DATABASE \
+            --schema $SNOWFLAKE_SCHEMA \
+            --host ${{ env.SNOWFLAKE_ACCOUNT }}.snowflakecomputing.com \
             --authenticator SNOWFLAKE_JWT \
             --no-interactive \
             --default
