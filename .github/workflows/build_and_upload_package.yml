@@ -33,6 +33,7 @@ jobs:
       - name: Build ZIP for Snowflake Stored Procedure
         run: |
           mkdir -p $ZIP_DIR/$PACKAGE_NAME
+
           rsync -av --exclude="__pycache__" src/$PACKAGE_NAME/ $ZIP_DIR/$PACKAGE_NAME/
           mkdir -p $ZIP_DIR/python
           pip install -r requirements.txt --target $ZIP_DIR/python
