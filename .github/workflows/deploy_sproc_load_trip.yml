@@ -1,0 +1,46 @@
+name: Deploy SP_LOAD_TRIP_FROM_STAGE
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  deploy-load-trip-sproc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Snowflake CLI
+        uses: snowflakedb/snowflake-cli-action@v2.0
+        with:
+          cli-version: "3.11.0"
+
+      - name: Configure Snowflake connection
+        run: |
+          echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY_BASE64 }}" | base64 --decode > snowflake_key.pem
+          chmod 600 snowflake_key.pem
+
+          snow connection add \
+            --connection-name github_ci_connection \
+            --accountname "${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}" \
+            --username "${{ secrets.SNOWFLAKE_USER }}" \
+            --private-key-file snowflake_key.pem \
+            --role "${{ secrets.SNOWFLAKE_ROLE }}" \
+            --database OPS \
+            --schema PROC \
+            --authenticator SNOWFLAKE_JWT \
+            --default \
+            --no-interactive
+
+      - name: Create or Replace SP_LOAD_TRIP_FROM_STAGE
+        run: |
+          snow sql -q "
+          CREATE OR REPLACE PROCEDURE OPS.PROC.SP_LOAD_TRIP_FROM_STAGE()
+          RETURNS STRING
+          LANGUAGE PYTHON
+          RUNTIME_VERSION = '3.10'
+          PACKAGES = ('snowflake-snowpark-python')
+          IMPORTS = ('@OPS.PROC.PROC_STAGE/trip_pipeline.zip')
+          HANDLER = 'trip_pipeline.sproc.load_trip_sproc.run';
+          "

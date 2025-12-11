@@ -1,6 +1,6 @@
 from src.trip_pipeline.dq.dq_check import DQCheck
 from unittest.mock import MagicMock,patch
-import importlib,pytest
+import importlib
 
 def dq_module_path():
     return importlib.import_module("trip_pipeline.dq.dq_check").__name__

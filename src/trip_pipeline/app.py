@@ -4,18 +4,16 @@ from trip_pipeline.transform.trip_data_transformer import trip_records_transform
 from trip_pipeline.transform.weather_data_transformer import pivot_weather_table
 from trip_pipeline.dq.dq_check import DQCheck
 from trip_pipeline.configs.data_objects import config
-from pathlib import Path
-import os
+
+from trip_pipeline.ingestion.weather_ingestion_service import fetch_and_stage_weather
+from trip_pipeline.utils.io_utils import copy_into_table
+
 
 
 def main(session):
 
 
     df_trip_orig = session.table(config.raw_trip_data)
-    df_weather = session.table(config.raw_weather_data)
-    
-
-    trip_df = trip_records_transformer(session)
 
     dq = DQCheck(session, config.trip_key_cols, config.dq_table_name)
 
@@ -37,7 +35,26 @@ def main(session):
     df_clean_int.write.mode("overwrite").save_as_table(config.valid_trip_data)
     print (f"{df_clean_int.count()} Total valid trip records written into {config.valid_trip_data} table")
 
-    ### Weather Data DQ Check ###
+    # Weather Fetch and Ingest
+    fetch_and_stage_weather(
+        session=session,
+        station_id=config.weather_station_id,
+        start_date=config.weather_start_date,
+        end_date=config.weather_end_date,
+        stage_name=config.weather_stage_name
+    )
+    copy_into_table(
+        session=session,
+        table_name=config.raw_weather_data,
+        stage_name=config.weather_stage_name,
+        file_format_type="CSV",
+        file_format_options={"PARSE_HEADER": "TRUE",
+            "FIELD_OPTIONALLY_ENCLOSED_BY": "'\"'",
+            },)
+    
+    df_weather = session.table(config.raw_weather_data)
+
+    # Weather Data DQ Check ###
     dq = DQCheck(session, config.weather_key_cols, config.dq_table_name)
 
     # Null Check
@@ -62,7 +79,7 @@ def main(session):
 
     z_lookup = session.table(config.zone_lookup)
     z_pickup = z_lookup.select(
-        col("LOCATIONID").alias("Pu_location_id"),
+        col("LOCATIONID").alias("pu_location_id"),
         col("BOROUGH").alias("pu_borough"),
         col("zone").alias("pu_zone"))
 
@@ -70,23 +87,27 @@ def main(session):
         col("LOCATIONID").alias("do_location_id"),
         col("BOROUGH").alias("do_borough"),
         col("zone").alias("do_zone"))
-
+    
+    trip_df = trip_records_transformer(session)
 
     join_df = trip_df.join(z_pickup,
-                        trip_df["PULocationID"]==z_pickup["Pu_location_id"]
+                        trip_df["pu_location_id"]==z_pickup["Pu_location_id"]
                         ).join(z_drop,
-                               trip_df["DOLocationID"]==z_drop["do_location_id"]
+                               trip_df["do_location_id"]==z_drop["do_location_id"]
                                ).join(weather_df,
-                                      trip_df["RideDate"] == weather_df["ODate"])
+                                      trip_df["ride_date"] == weather_df["o_date"])
 
-    final_df= join_df.with_column("PickupAddress",
+    final_df= join_df.with_column("pickup_address",
                                   concat_ws(lit(","),join_df["pu_zone"],join_df["pu_borough"])
-                                  ).with_column("DropAddress",
+                                  ).with_column("drop_address",
                                                 concat_ws(lit(","),join_df["do_zone"],join_df["do_borough"]))
 
 
-    final_df=final_df.select("VendorID","PickupAddress","DropAddress","PickupTime","DropoffTime","TripDistance","TotalAmount","Tmin","Tmax","Prcp","Snow","Snwd","Awnd","Wsf2","Wdf2","Wsf5","Wdf5")
+    final_df=final_df.select("vendor_id","pickup_address","drop_address","pickup_time","dropoff_time","trip_distance",
+                             "total_amount","tmin","tmax","prcp","snow","snwd","awnd","wsf2","wdf2","wsf5","wdf5")
+
     final_df.write.mode("overwrite").saveAsTable(config.final_table)
+    print("Final table populated successfully")
 
 if __name__ == "__main__":
     main()

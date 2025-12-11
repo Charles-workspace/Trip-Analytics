@@ -1,16 +1,16 @@
 variable "snowflake_account_name" {
   type = string
-  default = "PC98347"
+  default = "IX23027"
 }
 
 variable "snowflake_organization_name" {
   type = string
-  default = "HAINHSE"
+  default = "IPZTCCQ"
 }
 
 variable "snowflake_user" {
   type = string
-  default = "JACKSOP"
+  default = "JACKSBRAIN"
 }
 
 variable "snowflake_role" {

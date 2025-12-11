@@ -33,7 +33,7 @@ class DQCheck :
         df_invalid = df.filter(cond)
         df_valid = df.filter(~cond)
         print("Valid rows with no null/empty values in key columns")
-        df_valid.show()
+        #df_valid.show()
 
         print("Total:", df.count())
         print("Invalid (nulls):", df.filter(cond).count())

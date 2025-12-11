@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import date
 
 @dataclass(frozen=True)
 class Tableconfig:
@@ -23,18 +24,22 @@ class Tableconfig:
     pivoted_weather_table: str
     zone_lookup: str
     final_table: str
+    weather_station_id: str
+    weather_stage_name: str
+    weather_start_date: date
+    weather_end_date: date
 
 config = Tableconfig(
-trip_key_cols = ["VendorID", "tpep_pickup_datetime", "tpep_dropoff_datetime", "PULocationID", "DOLocationID"],
+trip_key_cols = ['"VendorID"', '"tpep_pickup_datetime"', '"tpep_dropoff_datetime"', '"PULocationID"', '"DOLocationID"'],
 weather_data_types = ["AWND", "WT01", "WSF5", "WSF2", "WDF5", "WDF2", "TMIN", "TMAX", "SNWD", "PRCP", "WT08", "SNOW", "WT03", "WT02"],
 
-trip_ts_columns = ["tpep_pickup_datetime", "tpep_dropoff_datetime"],
-trip_int_columns = ["VendorID", "PULocationID", "DOLocationID"],
+trip_ts_columns = ['"tpep_pickup_datetime"', '"tpep_dropoff_datetime"'],
+trip_int_columns = ['"VendorID"', '"PULocationID"', '"DOLocationID"'],
 
 
-weather_ts_columns = ["date"],
-weather_data_columns = ["datatype"],
-weather_key_cols = ["date", "datatype"],
+weather_ts_columns = ['"date"'],
+weather_data_columns = ['"datatype"'],
+weather_key_cols = ['"date"', '"datatype"'],
 
 
 dq_table_name="INBOUND_INTEGRATION.DQ_TRIP.TRIP_DATA_NULL_RECORDS",
@@ -52,5 +57,10 @@ raw_weather_data="INBOUND_INTEGRATION.LANDING_WEATHER.NYC_WEATHER",
 pivoted_weather_table = "INBOUND_INTEGRATION.SDS_WEATHER.WEATHER_DATA_PIVOTED",
 
 zone_lookup = "INBOUND_INTEGRATION.LANDING_TRIP.TAXI_ZONE_LOOKUP",
-final_table = "OUTBOUND_INTEGRATION.TRIP_ANALYTICS.TRIP_ANALYTICS"
+final_table = "OUTBOUND_INTEGRATION.TRIP_ANALYTICS.TRIP_ANALYTICS",
+
+weather_station_id="GHCND:USW00094728",
+weather_stage_name="INBOUND_INTEGRATION.LANDING_WEATHER.LANDING_WEATHER_STAGE",
+weather_start_date=date(2025, 5, 1),
+weather_end_date=date(2025, 5, 3)
 )
