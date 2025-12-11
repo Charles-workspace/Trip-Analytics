@@ -55,13 +55,13 @@ jobs:
           
           snow connection add \
             --connection-name github_ci_connection \
-            --accountname "$SF_ACCOUNT" \
-            --username "$SF_USER" \
-            --password "$SNOWFLAKE_PASSWORD" \
-            --role "$SF_ROLE" \
-            --database "$SF_DATABASE" \
-            --schema "$SF_SCHEMA" \
-            --authenticator snowflake \
+            --accountname "$SNOWFLAKE_ACCOUNT" \
+            --username "$SNOWFLAKE_USER" \
+            --private-key-file snowflake_key.pem \
+            --role "$SNOWFLAKE_ROLE" \
+            --database "$SNOWFLAKE_DATABASE" \
+            --schema "$SNOWFLAKE_SCHEMA" \
+            --authenticator SNOWFLAKE_JWT \
             --no-interactive \
             --default
 
