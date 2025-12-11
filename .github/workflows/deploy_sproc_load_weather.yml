@@ -45,5 +45,5 @@ jobs:
           RUNTIME_VERSION = '3.10'
           PACKAGES = ('snowflake-snowpark-python')
           IMPORTS = ('@OPS.PROC.PROC_STAGE/trip_pipeline.zip')
-          HANDLER = 'trip_pipeline.sproc.load_weather_sproc.run';
+          HANDLER = 'trip_pipeline.sprocs.load_weather_sproc.run';
           "

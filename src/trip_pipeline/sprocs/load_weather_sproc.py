@@ -8,10 +8,6 @@ def run(session: Session, start_date: str, end_date: str) -> str:
     """
     Stored Procedure: Loads weather CSV data from Snowflake landing stage
     into the landing weather table.
-
-    Expects the CSV already staged.
-
-    Only ingestion is performed here.
     """
     try:
         load_weather_from_stage(session, start_date, end_date)

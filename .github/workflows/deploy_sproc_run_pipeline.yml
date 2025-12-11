@@ -51,5 +51,5 @@ jobs:
             'pydantic'
           )
           IMPORTS = ('@OPS.PROC.PROC_STAGE/trip_pipeline.zip')
-          HANDLER = 'trip_pipeline.sproc.run_trip_pipeline_sproc.run';
+          HANDLER = 'trip_pipeline.sprocs.run_trip_pipeline_sproc.run';
           "
