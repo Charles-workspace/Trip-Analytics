@@ -14,7 +14,7 @@ from src.trip_pipeline.transform.trip_data_transformer import trip_records_trans
 
 @patch("src.trip_pipeline.transform.trip_data_transformer.to_date")
 @patch("src.trip_pipeline.transform.trip_data_transformer.to_timestamp")
-@patch("src.trip_pipeline.transform.trip_data_transformer.Session")
+#@patch("src.trip_pipeline.transform.trip_data_transformer.Session")
 def test_trip_records_transformer(mock_session_class, mock_to_timestamp, mock_to_date):
     # Setup mock session and mock table return
     mock_session = MagicMock()
@@ -27,8 +27,8 @@ def test_trip_records_transformer(mock_session_class, mock_to_timestamp, mock_to
     mock_session.table.return_value = mock_df
 
     # Mock transformations
-    mock_df.with_column.return_value = mock_df  # Chaining
-    mock_df.with_column_renamed.return_value = mock_df  # Chaining
+    mock_df.with_column.return_value = mock_df  
+    mock_df.with_column_renamed.return_value = mock_df 
     mock_df.select.return_value = mock_final_df
 
     # Call function
@@ -36,14 +36,12 @@ def test_trip_records_transformer(mock_session_class, mock_to_timestamp, mock_to
 
     # Assertions
     mock_session.table.assert_called_once()
-    mock_df.with_column.assert_any_call('"PickupTime"', mock_to_timestamp.return_value)
-    mock_df.with_column.assert_any_call('"DropoffTime"', mock_to_timestamp.return_value)
-    mock_df.with_column.assert_any_call('"RideDate"', mock_to_date.return_value)
-    mock_df.select.assert_called_once_with(
-        '"VendorID"', '"RideDate"', '"PickupTime"', '"DropoffTime"', '"TripDistance"',
-        '"PULocationID"', '"DOLocationID"', '"FareAmount"', '"TipAmount"',
-        '"TollsAmount"', '"TotalAmount"'
-    )
+    mock_df.with_column.assert_any_call("pickup_time", mock_to_timestamp.return_value)
+    mock_df.with_column.assert_any_call("dropoff_time", mock_to_timestamp.return_value)
+    mock_df.with_column.assert_any_call("ride_date", mock_to_date.return_value)
+    mock_df.select.assert_called_once_with("vendor_id","ride_date","pickup_time","dropoff_time","trip_distance",
+                                           "pu_location_id","do_location_id","fare_amount","tip_amount","tolls_amount","total_amount")
+
     assert result == mock_final_df
 
 

@@ -32,13 +32,10 @@ jobs:
       - name: Build ZIP for Snowflake Stored Procedure
         run: |
           mkdir -p $ZIP_DIR/$PACKAGE_NAME
-
-          # Copy the package code
           rsync -av --exclude="__pycache__" src/$PACKAGE_NAME/ $ZIP_DIR/$PACKAGE_NAME/
-
-
-          # Copy Snowflake requirements list
-          cp requirements.snowflake.txt $ZIP_DIR/
+          mkdir -p $ZIP_DIR/python
+          pip install -r requirements.txt --target $ZIP_DIR/python
+          cp requirements.txt $ZIP_DIR/
 
           cd $ZIP_DIR
           zip -r $ZIP_FILE_NAME .
