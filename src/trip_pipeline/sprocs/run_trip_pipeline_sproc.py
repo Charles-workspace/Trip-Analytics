@@ -4,7 +4,7 @@ from snowflake.snowpark import Session
 from trip_pipeline.app import main as pipeline_main
 
 
-def run(session: Session, start_date: str, end_date: str) -> str:
+def run(session: Session) -> str:
     """
     Stored Procedure: Executes the full Trip Analytics ETL pipeline.
 
@@ -17,7 +17,6 @@ def run(session: Session, start_date: str, end_date: str) -> str:
     """
     try:
         pipeline_main(session)
-        return (f"SP_RUN_TRIP_PIPELINE: Pipeline executed successfully "
-                f"for {start_date} to {end_date}.")
+        return (f"SP_RUN_TRIP_PIPELINE: Pipeline executed successfully ")
     except Exception as e:
         return f"SP_RUN_TRIP_PIPELINE failed: {e}"

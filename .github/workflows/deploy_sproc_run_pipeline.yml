@@ -36,10 +36,7 @@ jobs:
       - name: Create or Replace SP_RUN_TRIP_PIPELINE
         run: |
           snow sql -q "
-          CREATE OR REPLACE PROCEDURE OPS.PROC.SP_RUN_TRIP_PIPELINE(
-            start_date STRING,
-            end_date STRING
-          )
+          CREATE OR REPLACE PROCEDURE OPS.PROC.SP_RUN_TRIP_PIPELINE()
           RETURNS STRING
           LANGUAGE PYTHON
           RUNTIME_VERSION = '3.10'
