@@ -57,11 +57,11 @@ jobs:
             --connection-name github_ci_connection \
             --accountname "$SNOWFLAKE_ACCOUNT" \
             --username "$SNOWFLAKE_USER" \
-            --password "$SNOWFLAKE_PASSWORD" \
+            --private-key-file snowflake_key.pem \
             --role "$SNOWFLAKE_ROLE" \
             --database "$SNOWFLAKE_DATABASE" \
             --schema "$SNOWFLAKE_SCHEMA" \
-            --authenticator snowflake \
+            --authenticator SNOWFLAKE_JWT \
             --no-interactive \
             --default
 
