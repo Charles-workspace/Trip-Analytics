@@ -29,9 +29,9 @@ def main(session):
     df_after_dupes = dq.duplicate_check(df_after_nulls,config.dq_table_name)
 
     # Junk Check
-    df_junk_ts,df_clean_ts = dq.junk_value_check(df_after_dupes, config.trip_ts_columns,
+    df_junk_ts,df_clean_ts = dq.validate_trip_data(df_after_dupes, config.trip_ts_columns,
                                                  "timestamp_type")
-    df_junk_int,df_clean_int = dq.junk_value_check(df_clean_ts, config.trip_int_columns,
+    df_junk_int,df_clean_int = dq.validate_trip_data(df_clean_ts, config.trip_int_columns,
                                                    "integer_type")
 
     df_junk_int.write.mode("overwrite").save_as_table(config.invalid_trip_data)
@@ -66,10 +66,10 @@ def main(session):
     df_after_dupes = dq.duplicate_check(df_after_nulls, config.weather_null)
 
     # Junk Check
-    df_junk_ts,df_clean_ts = dq.weather_junk_val_check(df_after_dupes,
+    df_junk_ts,df_clean_ts = dq.validate_weather_data(df_after_dupes,
                                                        config.weather_ts_columns, "timestamp_type",
                                                        config.weather_data_types)
-    df_junk_int,df_clean_int = dq.weather_junk_val_check(df_clean_ts,
+    df_junk_int,df_clean_int = dq.validate_weather_data(df_clean_ts,
                                                          config.weather_data_columns,
                                                          "datatype_check",
                                                          config.weather_data_types)

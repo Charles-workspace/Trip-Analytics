@@ -32,6 +32,8 @@ class Tableconfig:
     weather_stage_name: str
     weather_start_date: date
     weather_end_date: date
+    min_valid_epoch: int
+
 
 config = Tableconfig(
 trip_key_cols = ['"VendorID"', '"tpep_pickup_datetime"',
@@ -68,5 +70,7 @@ final_table = "OUTBOUND_INTEGRATION.TRIP_ANALYTICS.TRIP_ANALYTICS",
 weather_station_id="GHCND:USW00094728",
 weather_stage_name="INBOUND_INTEGRATION.LANDING_WEATHER.LANDING_WEATHER_STAGE",
 weather_start_date=date(2025, 5, 1),
-weather_end_date=date(2025, 5, 3)
+weather_end_date=date(2025, 5, 3),
+
+min_valid_epoch = 1600000000000
 )

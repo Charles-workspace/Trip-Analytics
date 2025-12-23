@@ -1,6 +1,7 @@
-from snowflake.snowpark.functions import col, lit, trim, row_number, try_cast
+from snowflake.snowpark.functions import col, lit, trim, row_number, try_cast, current_timestamp
 from snowflake.snowpark.window import Window
 from snowflake.snowpark.types import IntegerType,TimestampType
+from trip_pipeline.configs.data_objects import config
 
 class DQCheck :
     """
@@ -30,7 +31,12 @@ class DQCheck :
         """
         null_condition = None
         for column in self.key_columns:
-            condition = col(column).is_null() |  (trim(col(column)) == lit(""))
+            col_str = trim(col(column).cast("string"))
+            is_null = col_str.is_null()
+            is_empty = col_str == lit("")
+            is_null_string = col_str.isin("", "NULL")
+
+            condition = is_null | is_empty | is_null_string
             null_condition = condition if null_condition is None else null_condition | condition
         return null_condition
 
@@ -40,25 +46,25 @@ class DQCheck :
         and stores violating rows in a DQ table.
         """
         cond = self.build_null_condition()
+        total_count = df.count()
 
-        #print(cond)
-
-        print ("Invalid rows with null/empty values in key columns")
         df_invalid = df.filter(cond)
         df_valid = df.filter(~cond)
-        print("Valid rows with no null/empty values in key columns")
-        #df_valid.show()
 
-        print("Total:", df.count())
-        print("Invalid (nulls):", df.filter(cond).count())
-        print("Valid:", df.filter(~cond).count())
+        valid_count = df_valid.count()
+        invalid_count = df_invalid.count()
+
+        print("Total:", total_count)
+        print("Invalid (nulls):", valid_count)
+        print("Valid:", invalid_count)
+
         if df_invalid.count() > 0:
-            print(f"Found {df_invalid.count()} rows with null/empty values in key columns.")
+            print(f"Found {invalid_count} rows with null/empty values in key columns.")
             df_invalid.write.mode("overwrite").save_as_table(dq_table_name)
 
         else:
             print("No null/empty values found in key columns.")
-        return df_invalid.count(), df_valid
+        return invalid_count, df_valid
     
     def duplicate_check(self, df, dq_table_name):
         """
@@ -68,28 +74,34 @@ class DQCheck :
 
         # introduce row number to append only the first occurence of the duplicated 
         # records to clean and the rest to duplicates tables
-        df_full_dedup = df.with_column('rn', (row_number().
-                        over(Window.
-                             partition_by([col(c) for c in self.key_columns]).
-                             order_by([col(c) for c in self.key_columns]))))
-        df_full_dedup_clean = df_full_dedup.filter(col('rn') == 1)
-        df_full_dedup_clean = df_full_dedup_clean.drop('rn')
-        df_full_dedup = df_full_dedup.filter(col('rn') != 1).drop('rn')
+        df_full_dedup = df.with_column(
+            'rn',
+            row_number().over(
+                Window
+                .partition_by([col(c) for c in self.key_columns])
+                .order_by([col(c) for c in self.key_columns])
+            )
+        )
 
-        clean_count = df_full_dedup_clean.count()
-        #print (f"{clean_count} clean records")
+        df_clean = df_full_dedup.filter(col('rn') == 1).drop('rn')
+        df_dupes = (
+            df_full_dedup
+            .filter(col('rn') != 1)
+            .drop('rn')
+            .with_column("dq_ts", current_timestamp())
+        )
 
-        dupe_count = df_full_dedup.count()
+        dupe_count = df_dupes.count()
         
         if dupe_count > 0:
             print(f"{dupe_count} duplicate rows found. Recording to {dq_table_name}")
-            df_full_dedup.write.mode("overwrite").save_as_table(dq_table_name)
+            df_dupes.write.mode("overwrite").save_as_table(dq_table_name)
         else:
             print("Duplicate check passed: No duplicate found")
 
-        return df_full_dedup_clean
+        return df_clean
 
-    def junk_value_check(self, df, columns, dtype, min_valid_epoch=1600000000000):
+    def validate_trip_data(self, df, columns, dtype, min_valid_epoch=config.min_valid_epoch):
         """
         Flags rows where timestamp fields are present but invalid:
         - Either not castable to integer
@@ -109,7 +121,7 @@ class DQCheck :
 
         return df.filter(junk_condition),df.filter(~junk_condition)
 
-    def weather_junk_val_check (self,df,columns,dtype,weather_data_types):
+    def validate_weather_data (self,df,columns,dtype,weather_data_types):
         junk_condition = None
 
         for column in columns:
