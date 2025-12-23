@@ -147,9 +147,11 @@ def test_duplicate_check_with_duplicates():
     mock_clean_df.drop.return_value = mock_clean_df
     mock_dupe_df.drop.return_value = mock_dupe_df
 
-    # Simulate counts
-    mock_clean_df.count.return_value = 3
-    mock_dupe_df.count.return_value = 2
+    # simulate with_column("dq_ts")
+    mock_dupe_with_ts = MagicMock()
+    mock_dupe_df.with_column.return_value = mock_dupe_with_ts
+    mock_dupe_with_ts.count.return_value = 2
+
 
     # Setup write mocks
     mock_write = MagicMock()
