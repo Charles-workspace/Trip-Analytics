@@ -4,3 +4,4 @@ pandas
 requests
 snowflake-connector-python
 pydantic
+pylint>=3.2

@@ -9,7 +9,7 @@ def retry_on_failure(max_retries: int = 3, backoff_seconds: int = 1):
     """
     Simple retry decorator with exponential backoff.
 
-    - Retries on *any* exception up to max_retries.
+    - Retries on any exception up to max_retries.
     - Backoff grows as: backoff_seconds * 2**(attempt-1)
     """
     def decorator(func):
@@ -19,7 +19,7 @@ def retry_on_failure(max_retries: int = 3, backoff_seconds: int = 1):
             for attempt in range(1, max_retries + 1):
                 try:
                     return func(*args, **kwargs)
-                except Exception as exc:  # noqa: BLE001
+                except Exception as exc:  # pylint: disable=broad-exception-caught
                     last_exc = exc
                     if attempt == max_retries:
                         logger.error(

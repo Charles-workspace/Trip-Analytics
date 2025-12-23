@@ -14,7 +14,7 @@ from src.trip_pipeline.transform.trip_data_transformer import trip_records_trans
 
 @patch("src.trip_pipeline.transform.trip_data_transformer.to_date")
 @patch("src.trip_pipeline.transform.trip_data_transformer.to_timestamp")
-#@patch("src.trip_pipeline.transform.trip_data_transformer.Session")
+@patch("src.trip_pipeline.transform.trip_data_transformer.Session")
 def test_trip_records_transformer(mock_session_class, mock_to_timestamp, mock_to_date):
     # Setup mock session and mock table return
     mock_session = MagicMock()

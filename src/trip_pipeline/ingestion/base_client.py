@@ -1,9 +1,6 @@
 from __future__ import annotations
-
 from typing import Any, Dict, Optional
-
 import requests
-
 from trip_pipeline.utils.logger import get_logger
 from trip_pipeline.utils.retry import retry_on_failure
 

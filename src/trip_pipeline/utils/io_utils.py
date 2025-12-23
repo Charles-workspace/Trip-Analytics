@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-import json
-from pathlib import Path
+
 from typing import Optional, Dict
 
 from snowflake.snowpark import Session
@@ -37,5 +36,5 @@ def copy_into_table(
         {pattern_clause}
     """
     print(f"Running COPY INTO for {table_name} from {stage_ref}")
-    # print(sql) 
+    # print(sql)
     session.sql(sql).collect()
