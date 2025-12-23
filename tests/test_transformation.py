@@ -72,5 +72,5 @@ def test_pivot_weather_table():
     assert result == mock_selected_df
     mock_session.table.assert_called_once()
     mock_df.select.assert_called_once_with("datatype")
-    mock_df.group_by.assert_called_once_with("DATE")
+    mock_df.group_by.assert_called_once_with("date")
     mock_renamed_df.select.assert_called_once()
