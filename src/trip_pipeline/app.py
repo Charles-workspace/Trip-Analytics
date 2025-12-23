@@ -12,6 +12,8 @@ from trip_pipeline.utils.io_utils import copy_into_table
 
 def main(session):
 
+    if session is None:
+        raise ValueError("Session must be provided")
 
     df_trip_orig = session.table(config.raw_trip_data)
 
