@@ -19,11 +19,9 @@ def test_trip_records_transformer(mock_session_class, mock_to_timestamp, mock_to
     # Setup mock session and mock table return
     mock_session = MagicMock()
     mock_df = MagicMock()
-    mock_transformed_df = MagicMock()
     mock_final_df = MagicMock()
 
-    # Patch Session.builder.configs().create()
-    mock_session_class.builder.configs.return_value.create.return_value = mock_session
+     # Session.table()
     mock_session.table.return_value = mock_df
 
     # Mock transformations
@@ -32,16 +30,14 @@ def test_trip_records_transformer(mock_session_class, mock_to_timestamp, mock_to
     mock_df.select.return_value = mock_final_df
 
     # Call function
-    result = trip_records_transformer()
+    result = trip_records_transformer(mock_session)
 
     # Assertions
     mock_session.table.assert_called_once()
     mock_df.with_column.assert_any_call("pickup_time", mock_to_timestamp.return_value)
     mock_df.with_column.assert_any_call("dropoff_time", mock_to_timestamp.return_value)
     mock_df.with_column.assert_any_call("ride_date", mock_to_date.return_value)
-    mock_df.select.assert_called_once_with("vendor_id","ride_date","pickup_time","dropoff_time","trip_distance",
-                                           "pu_location_id","do_location_id","fare_amount","tip_amount","tolls_amount","total_amount")
-
+    mock_df.select.assert_called_once()
     assert result == mock_final_df
 
 

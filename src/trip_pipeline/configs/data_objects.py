@@ -3,6 +3,10 @@ from datetime import date
 
 @dataclass(frozen=True)
 class Tableconfig:
+    """
+    This class holds the table names, key columns parameterized which are used throughout 
+    the pipeline.
+    """
     trip_key_cols: list
     weather_key_cols: list
     weather_data_types: list
@@ -30,8 +34,10 @@ class Tableconfig:
     weather_end_date: date
 
 config = Tableconfig(
-trip_key_cols = ['"VendorID"', '"tpep_pickup_datetime"', '"tpep_dropoff_datetime"', '"PULocationID"', '"DOLocationID"'],
-weather_data_types = ["AWND", "WT01", "WSF5", "WSF2", "WDF5", "WDF2", "TMIN", "TMAX", "SNWD", "PRCP", "WT08", "SNOW", "WT03", "WT02"],
+trip_key_cols = ['"VendorID"', '"tpep_pickup_datetime"',
+                 '"tpep_dropoff_datetime"','"PULocationID"','"DOLocationID"'],
+weather_data_types = ["AWND", "WT01", "WSF5", "WSF2", "WDF5", "WDF2", "TMIN",
+                      "TMAX", "SNWD", "PRCP", "WT08", "SNOW", "WT03", "WT02"],
 
 trip_ts_columns = ['"tpep_pickup_datetime"', '"tpep_dropoff_datetime"'],
 trip_int_columns = ['"VendorID"', '"PULocationID"', '"DOLocationID"'],
