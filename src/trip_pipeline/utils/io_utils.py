@@ -36,5 +36,4 @@ def copy_into_table(
         {pattern_clause}
     """
     print(f"Running COPY INTO for {table_name} from {stage_ref}")
-    # print(sql)
     session.sql(sql).collect()

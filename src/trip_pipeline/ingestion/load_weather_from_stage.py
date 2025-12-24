@@ -1,15 +1,15 @@
 from trip_pipeline.utils.io_utils import copy_into_table
+from trip_pipeline.configs.data_objects import config
+from utils.logger import get_logger
 
+logger = get_logger(__name__)
 
 def load_weather_from_stage(session):
 
-    stage = "INBOUND_INTEGRATION.LANDING_WEATHER.LANDING_WEATHER_STAGE"
-    table = "INBOUND_INTEGRATION.LANDING_WEATHER.NYC_WEATHER"
-
     copy_into_table(
         session=session,
-        table_name=table,
-        stage_name=stage,
+        table_name=config.raw_weather_data,
+        stage_name=config.weather_stage_name,
         file_format_type="CSV",
         file_format_options={
             "FIELD_OPTIONALLY_ENCLOSED_BY": "'\"'",
@@ -18,5 +18,5 @@ def load_weather_from_stage(session):
 
     )
 
-    print("Weather landing table loaded from stage.")
+    logger.info("Weather data loaded from stage to table %s", config.raw_weather_data)
 

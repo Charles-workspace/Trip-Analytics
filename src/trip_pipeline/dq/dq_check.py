@@ -1,7 +1,8 @@
-from snowflake.snowpark.functions import col, lit, trim, row_number, try_cast, current_timestamp
+from snowflake.snowpark.functions import col, lit, trim, row_number, try_cast, current_timestamp, upper
 from snowflake.snowpark.window import Window
 from snowflake.snowpark.types import IntegerType,TimestampType
 from trip_pipeline.configs.data_objects import config
+from utils.logger import get_logger
 
 class DQCheck :
     """
@@ -12,7 +13,6 @@ class DQCheck :
     Arguments:
     session : Snowpark Session object
     key_columns : List of critical key columns to be used for DQ checks
-    dq_table_name : Name of the table to write the DQ failed records 
     specific to the source data.
 
     Method:
@@ -20,10 +20,10 @@ class DQCheck :
     as a DataFrame for further processing.
     """
 
-    def __init__(self,session,key_columns, dq_table_name ):
+    def __init__(self,session,key_columns):
         self.session = session
         self.key_columns = key_columns
-        self.dq_table_name = dq_table_name
+        self.logger = get_logger(__name__)
 
     def build_null_condition(self):
         """
@@ -32,12 +32,19 @@ class DQCheck :
         null_condition = None
         for column in self.key_columns:
             col_str = trim(col(column).cast("string"))
+
             is_null = col_str.is_null()
             is_empty = col_str == lit("")
-            is_null_string = col_str.isin("", "NULL")
+            is_null_string = upper(col_str).isin("", "NULL")
 
             condition = is_null | is_empty | is_null_string
             null_condition = condition if null_condition is None else null_condition | condition
+
+        self.logger.info(
+            "Null check policy applied | columns=%s | rules=[NULL, empty string, 'NULL']",
+            self.key_columns
+            )
+
         return null_condition
 
     def null_check(self,df,dq_table_name):
@@ -54,17 +61,22 @@ class DQCheck :
         valid_count = df_valid.count()
         invalid_count = df_invalid.count()
 
-        print("Total:", total_count)
-        print("Invalid (nulls):", valid_count)
-        print("Valid:", invalid_count)
+        self.logger.info("DQ null check completed | total=%d | invalid=%d | valid=%d",
+                         total_count,
+                         invalid_count,
+                         valid_count
+                         )
 
-        if df_invalid.count() > 0:
-            print(f"Found {invalid_count} rows with null/empty values in key columns.")
+        if invalid_count > 0:
             df_invalid.write.mode("overwrite").save_as_table(dq_table_name)
+            self.logger.warning("%d invalid records written to DQ table %s",
+                             invalid_count,
+                             dq_table_name)
 
         else:
-            print("No null/empty values found in key columns.")
-        return invalid_count, df_valid
+            self.logger.info("Null check passed: No null/empty values found in key columns")
+
+        return df_valid
     
     def duplicate_check(self, df, dq_table_name):
         """
@@ -94,10 +106,10 @@ class DQCheck :
         dupe_count = df_dupes.count()
         
         if dupe_count > 0:
-            print(f"{dupe_count} duplicate rows found. Recording to {dq_table_name}")
             df_dupes.write.mode("overwrite").save_as_table(dq_table_name)
+            self.logger.warning("%d duplicate rows found during DQ check", dupe_count)
         else:
-            print("Duplicate check passed: No duplicate found")
+            self.logger.info("No duplicate rows found during DQ check")
 
         return df_clean
 
@@ -112,6 +124,8 @@ class DQCheck :
         for column in columns:
             trimmed_col = trim(col(column))
             casted_col = try_cast(trimmed_col, IntegerType())
+            condition = None
+
             if dtype == "timestamp_type":
                 condition = ((casted_col.is_null()) | (casted_col < min_valid_epoch))
             else :
@@ -134,7 +148,7 @@ class DQCheck :
             elif dtype == "datatype_check":
                 condition = ~trimmed_col.isin(weather_data_types)
             else:
-                raise ValueError(f"Unsupported dtype for junk check: {dtype}")
+                self.logger.warning("Unsupported dtype for junk check: %s", dtype)
 
             junk_condition = (
                 condition if junk_condition is None else junk_condition | condition
