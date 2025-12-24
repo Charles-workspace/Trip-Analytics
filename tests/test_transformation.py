@@ -17,7 +17,7 @@ def test_trip_records_transformer(mock_to_date, mock_to_timestamp):
     df.with_column_renamed.return_value = df
     df.select.return_value = final_df
 
-    result = trip_records_transformer(session)
+    result = trip_records_transformer(session,valid_trip_data=config.valid_trip_data)
 
     session.table.assert_called_once_with(config.valid_trip_data)
 
