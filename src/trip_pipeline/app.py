@@ -4,44 +4,52 @@ from trip_pipeline.transform.trip_data_transformer import trip_records_transform
 from trip_pipeline.transform.weather_data_transformer import pivot_weather_table
 from trip_pipeline.dq.dq_check import DQCheck
 from trip_pipeline.configs.data_objects import config
-
-
 from trip_pipeline.utils.io_utils import copy_into_table
-
-
+from trip_pipeline.utils.logger import get_logger
 
 def main(session):
+    logger = get_logger(__name__)
 
     if session is None:
-        raise ValueError("Session must be provided")
+        logger.error("Snowpark session is not provided. Exiting the application.")
+        raise ValueError("Session must be provided.")
 
+    logger.info("Starting Trip Data Pipeline")
     df_trip_orig = session.table(config.raw_trip_data)
 
-    dq = DQCheck(session, config.trip_key_cols, config.dq_table_name)
+    logger.info("Starting Trip data DQ checks")
+    dq = DQCheck(session, config.trip_key_cols)
 
-    # Null Check
-    null_count, df_after_nulls = dq.null_check(df_trip_orig, config.dq_table_name)
-    if null_count == 0:
-        print("Proceeding to duplicate check")
-    else:
-        print("Nulls found. Review before proceeding.")
+    # Trip data null check
+    df_after_nulls = dq.null_check(df_trip_orig, config.trip_null)
 
-    df_after_dupes = dq.duplicate_check(df_after_nulls,config.dq_table_name)
+    # Trip data duplicate check
+    df_after_dupes = dq.duplicate_check(df_after_nulls,config.trip_duplicates)
 
-    # Junk Check
+    # Trip data invalid junk data check
     df_junk_ts,df_clean_ts = dq.validate_trip_data(df_after_dupes, config.trip_ts_columns,
                                                  "timestamp_type")
     df_junk_int,df_clean_int = dq.validate_trip_data(df_clean_ts, config.trip_int_columns,
                                                    "integer_type")
+    timestamp_invalids = df_junk_ts.count()
+    integer_invalids = df_junk_int.count()
+    clean_count = df_clean_int.count()
 
-    df_junk_int.write.mode("overwrite").save_as_table(config.invalid_trip_data)
-    df_junk_ts.write.mode("append").save_as_table(config.invalid_trip_data)
+    df_junk_ts.write.mode("overwrite").save_as_table(config.invalid_trip_data)
+    logger.warning("%d Invalid Trip data records with junk values written into %s table", 
+                timestamp_invalids,config.invalid_trip_data)    
+    df_junk_int.write.mode("append").save_as_table(config.invalid_trip_data)
+    logger.warning("%d Invalid Trip data records with junk values written into %s table", 
+                integer_invalids,config.invalid_trip_data)
     df_clean_int.write.mode("overwrite").save_as_table(config.valid_trip_data)
-    print (
-        f"{df_clean_int.count()} Total valid trip records "
-        f"written into {config.valid_trip_data} table")
+    logger.info("%d valid Trip data records written into %s table", 
+                clean_count,config.valid_trip_data)
 
 
+    logger.info("Copying Weather data from stage %s into %s",
+            config.weather_stage_name,
+            config.raw_weather_data)
+    
     copy_into_table(
         session=session,
         table_name=config.raw_weather_data,
@@ -53,19 +61,13 @@ def main(session):
 
     df_weather = session.table(config.raw_weather_data)
 
-    # Weather Data DQ Check ###
-    dq = DQCheck(session, config.weather_key_cols, config.dq_table_name)
+    logger.info("Starting Weather DQ checks")
+    dq = DQCheck(session, config.weather_key_cols)
 
-    # Null Check
-    null_count, df_after_nulls = dq.null_check(df_weather, config.weather_null)
-    if null_count == 0:
-        print("Proceeding to duplicate check")
-    else:
-        print("Nulls found. Review before proceeding.")
+    df_after_nulls = dq.null_check(df_weather, config.weather_null)
+    
+    df_after_dupes = dq.duplicate_check(df_after_nulls, config.weather_duplicates)
 
-    df_after_dupes = dq.duplicate_check(df_after_nulls, config.weather_null)
-
-    # Junk Check
     df_junk_ts,df_clean_ts = dq.validate_weather_data(df_after_dupes,
                                                        config.weather_ts_columns, "timestamp_type",
                                                        config.weather_data_types)
@@ -73,15 +75,27 @@ def main(session):
                                                          config.weather_data_columns,
                                                          "datatype_check",
                                                          config.weather_data_types)
+    
+    timestamp_invalids = df_junk_ts.count()
+    integer_invalids = df_junk_int.count()
+    clean_count = df_clean_int.count()
 
-    df_junk_int.write.mode("overwrite").save_as_table(config.invalid_weather_data)
+    df_junk_ts.write.mode("overwrite").save_as_table(config.invalid_weather_data)
+    logger.warning("%d Invalid Weather data records with junk values written into %s table", 
+                timestamp_invalids,config.invalid_weather_data)
+    
+    df_junk_int.write.mode("append").save_as_table(config.invalid_weather_data)
+    logger.warning("%d Invalid Weather data records with junk values written into %s table", 
+                integer_invalids,config.invalid_weather_data)
+    
     df_clean_int.write.mode("overwrite").save_as_table(config.valid_weather_data)
-    print (
-        f"{df_clean_int.count()} Total valid weather data records "
-        f"written into {config.valid_weather_data} table")
+    logger.info("%d Valid Weather data records written into %s table", 
+                clean_count,config.valid_weather_data)
 
     weather_df = pivot_weather_table(session,config.valid_weather_data)
     weather_df.write.mode("overwrite").save_as_table(config.pivoted_weather_table)
+    logger.info("Pivoted Weather data written into %s table", 
+                config.pivoted_weather_table)
 
     z_lookup = session.table(config.zone_lookup)
     z_pickup = z_lookup.select(
@@ -94,7 +108,7 @@ def main(session):
         col("BOROUGH").alias("do_borough"),
         col("zone").alias("do_zone"))
 
-    trip_df = trip_records_transformer(session)
+    trip_df = trip_records_transformer(session, config.valid_trip_data)
 
     join_df = trip_df.join(z_pickup,
                         trip_df["pu_location_id"]==z_pickup["Pu_location_id"]
@@ -115,7 +129,4 @@ def main(session):
                              "snwd","awnd","wsf2","wdf2","wsf5","wdf5")
 
     final_df.write.mode("overwrite").saveAsTable(config.final_table)
-    print("Final table populated successfully")
-
-#if __name__ == "__main__":
-#    main()
+    logger.info("Trip Data Pipeline completed successfully")

@@ -15,7 +15,7 @@ class Tableconfig:
     weather_ts_columns: list
     weather_data_columns: list
 
-    dq_table_name: str
+    trip_null: str
     invalid_trip_data: str
     valid_trip_data: str
     trip_duplicates: str
@@ -29,6 +29,7 @@ class Tableconfig:
     zone_lookup: str
     final_table: str
     weather_station_id: str
+    trip_stage_name: str
     weather_stage_name: str
     weather_start_date: date
     weather_end_date: date
@@ -50,17 +51,19 @@ weather_data_columns = ['"datatype"'],
 weather_key_cols = ['"date"', '"datatype"'],
 
 
-dq_table_name="INBOUND_INTEGRATION.DQ_TRIP.TRIP_DATA_NULL_RECORDS",
+raw_trip_data = "INBOUND_INTEGRATION.LANDING_TRIP.YELLOW_TRIP_RECORDS",
+trip_null = "INBOUND_INTEGRATION.DQ_TRIP.TRIP_DATA_NULL_RECORDS",
+trip_duplicates = "INBOUND_INTEGRATION.DQ_TRIP.TRIP_DATA_DUPLICATES",
 invalid_trip_data = "INBOUND_INTEGRATION.DQ_TRIP.INVALID_TRIP_DATA",
 valid_trip_data="INBOUND_INTEGRATION.SDS_TRIP.TRIP_DATA_VALIDATED",
-trip_duplicates = "INBOUND_INTEGRATION.DQ_TRIP.TRIP_DATA_DUPLICATES",
-raw_trip_data = "INBOUND_INTEGRATION.LANDING_TRIP.YELLOW_TRIP_RECORDS",
 
+trip_stage_name="INBOUND_INTEGRATION.LANDING_TRIP.LANDING_TRIP_STAGE",
+
+raw_weather_data="INBOUND_INTEGRATION.LANDING_WEATHER.NYC_WEATHER",
 weather_null = "INBOUND_INTEGRATION.DQ_WEATHER.WEATHER_NULL_RECORDS",
 weather_duplicates = "INBOUND_INTEGRATION.DQ_WEATHER.WEATHER_DATA_DUPLICATES",
-valid_weather_data = "INBOUND_INTEGRATION.SDS_WEATHER.WEATHER_DATA_VALIDATED",
 invalid_weather_data = "INBOUND_INTEGRATION.DQ_WEATHER.INVALID_WEATHER_DATA",
-raw_weather_data="INBOUND_INTEGRATION.LANDING_WEATHER.NYC_WEATHER",
+valid_weather_data = "INBOUND_INTEGRATION.SDS_WEATHER.WEATHER_DATA_VALIDATED",
 
 pivoted_weather_table = "INBOUND_INTEGRATION.SDS_WEATHER.WEATHER_DATA_PIVOTED",
 

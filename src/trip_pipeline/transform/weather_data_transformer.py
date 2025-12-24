@@ -1,6 +1,7 @@
 from snowflake.snowpark.functions import col,min,to_date
+from trip_pipeline.utils.logger import get_logger
 
-#valid_weather_data = "INBOUND_INTEGRATION.SDS_WEATHER.WEATHER_DATA_VALIDATED"
+logger = get_logger(__name__)
 
 def clean_weather_columns(df):
     rename_map = {}
@@ -26,6 +27,9 @@ def pivot_weather_table(session, valid_weather_data):
 
     # CLEAN COLUMN NAMES FIRST
     df = clean_weather_columns(df)
+    input_count = df.count()
+
+    logger.info("Weather pivot started")
 
     datatypes = [row[0] for row in df.select("datatype").distinct().collect()]
 
@@ -39,9 +43,12 @@ def pivot_weather_table(session, valid_weather_data):
 
     pivoted_df = pivoted_df.with_column("o_date", to_date(col("date")))
 
-    return pivoted_df.select(
+    pivoted_df = pivoted_df.select(
         "o_date",
         "tmin", "tmax", "prcp",
         "snow", "snwd", "awnd",
         "wsf2", "wdf2", "wsf5", "wdf5"
     )
+    output_count = pivoted_df.count()
+    logger.info("Weather pivot complete | input_rows=%d | output_rows=%d", input_count, output_count)
+    return pivoted_df

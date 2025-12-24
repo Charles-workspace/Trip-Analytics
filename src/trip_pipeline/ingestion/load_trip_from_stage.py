@@ -1,17 +1,21 @@
 from trip_pipeline.utils.io_utils import  copy_into_table
+from trip_pipeline.configs.data_objects import config
+from trip_pipeline.utils.logger import get_logger
 
+logger = get_logger(__name__)
 
 def load_trip_from_stage(session):
-
-    stage = "INBOUND_INTEGRATION.LANDING_TRIP.LANDING_TRIP_STAGE"
-    trip_table = "INBOUND_INTEGRATION.LANDING_TRIP.YELLOW_TRIP_RECORDS"
-    zone_table = "INBOUND_INTEGRATION.LANDING_TRIP.TAXI_ZONE_LOOKUP"
+    """
+    Load trip data from stage to raw trip table.
+    Args:
+        session: Snowflake Snowpark session object from the S-proc wrapper
+    """
 
     # Trip parquet
     copy_into_table(
         session=session,
-        table_name=trip_table,
-        stage_name=stage,
+        table_name=config.raw_trip_data,
+        stage_name=config.trip_stage_name,
         file_format_type="PARQUET",
         pattern=".*yellow_tripdata_.*\\.parquet.*",
     )
@@ -19,8 +23,8 @@ def load_trip_from_stage(session):
     # Taxi zone lookup CSV
     copy_into_table(
         session=session,
-        table_name=zone_table,
-        stage_name=stage,
+        table_name=config.zone_lookup,
+        stage_name=config.trip_stage_name,
         file_format_type="CSV",
         file_format_options={
             "FIELD_OPTIONALLY_ENCLOSED_BY": "'\"'",
@@ -28,4 +32,4 @@ def load_trip_from_stage(session):
         },
         pattern=".*taxi_zone_lookup.\\.csv.*",
     )
-    print("Trip tables loaded from stage.")
+    logger.info("Trip data and zone lookup data loaded from stage to raw tables.")
