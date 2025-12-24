@@ -2,7 +2,7 @@ from snowflake.snowpark.functions import col, lit, trim, row_number, try_cast, c
 from snowflake.snowpark.window import Window
 from snowflake.snowpark.types import IntegerType,TimestampType
 from trip_pipeline.configs.data_objects import config
-from utils.logger import get_logger
+from trip_pipeline.utils.logger import get_logger
 
 class DQCheck :
     """

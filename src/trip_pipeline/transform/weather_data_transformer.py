@@ -1,5 +1,5 @@
 from snowflake.snowpark.functions import col,min,to_date
-from utils.logger import get_logger
+from trip_pipeline.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

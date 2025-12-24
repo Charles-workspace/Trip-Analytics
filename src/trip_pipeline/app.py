@@ -5,7 +5,7 @@ from trip_pipeline.transform.weather_data_transformer import pivot_weather_table
 from trip_pipeline.dq.dq_check import DQCheck
 from trip_pipeline.configs.data_objects import config
 from trip_pipeline.utils.io_utils import copy_into_table
-from utils.logger import get_logger
+from trip_pipeline.utils.logger import get_logger
 
 def main(session):
     logger = get_logger(__name__)

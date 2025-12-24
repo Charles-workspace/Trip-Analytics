@@ -1,6 +1,6 @@
 from trip_pipeline.utils.io_utils import  copy_into_table
 from trip_pipeline.configs.data_objects import config
-from utils.logger import get_logger
+from trip_pipeline.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
