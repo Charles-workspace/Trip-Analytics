@@ -40,12 +40,12 @@ def main(session):
         clean_count = df_clean_int.count()
 
         if invalids_count > 0:
-            datatype_invalids.write.mode("overwrite").save_as_table(config.invalid_weather_data)
+            datatype_invalids.write.mode("overwrite").save_as_table(config.invalid_trip_data)
             logger.warning("%d Invalid trip data records with junk values found", invalids_count)
         else:
             logger.info("No Invalid trip data records with junk values found."
-            "%d Valid trip data records written into %s table", 
-                    clean_count,config.valid_weather_data )
+            " %d Valid trip data records written into %s table", 
+                    clean_count,config.valid_trip_data )
 
         logger.info("Copying Weather data from stage %s into %s",
                 config.weather_stage_name,

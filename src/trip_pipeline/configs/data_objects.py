@@ -73,7 +73,7 @@ final_table = "OUTBOUND_INTEGRATION.TRIP_ANALYTICS.TRIP_ANALYTICS",
 weather_station_id="GHCND:USW00094728",
 weather_stage_name="INBOUND_INTEGRATION.LANDING_WEATHER.LANDING_WEATHER_STAGE",
 weather_start_date=date(2025, 5, 1),
-weather_end_date=date(2025, 5, 3),
+weather_end_date=date(2025, 5, 31),
 
 min_valid_epoch = 1600000000000
 )
