@@ -43,11 +43,11 @@ def main(session):
             datatype_invalids.write.mode("overwrite").save_as_table(config.invalid_trip_data)
             logger.warning("%d Invalid trip data records with junk values found", invalids_count)
         else:
-            df_clean_int.write.mode("overwrite").save_as_table(config.valid_trip_data)
-            logger.info("No Invalid trip data records with junk values found."
-            " %d Valid trip data records written into %s table", 
+            logger.info("No Invalid trip data records with junk values found.")
+            
+        df_clean_int.write.mode("overwrite").save_as_table(config.valid_trip_data)
+        logger.info("%d Valid trip data records written into %s table", 
                     clean_count,config.valid_trip_data )
-
         logger.info("Copying Weather data from stage %s into %s",
                 config.weather_stage_name,
                 config.raw_weather_data)
@@ -86,9 +86,10 @@ def main(session):
             datatype_invalids.write.mode("overwrite").save_as_table(config.invalid_weather_data)
             logger.warning("%d Invalid Weather data records with junk values found", invalids_count)
         else:
-            df_clean_int.write.mode("overwrite").save_as_table(config.valid_weather_data)
-            logger.info("No Invalid Weather data records with junk values found."
-            "%d Valid Weather data records written into %s table", 
+            logger.info("No Invalid Weather data records with junk values found.")
+                       
+        df_clean_int.write.mode("overwrite").save_as_table(config.valid_weather_data)
+        logger.info("%d Valid Weather data records written into %s table", 
                     clean_count,config.valid_weather_data )
 
         weather_df = pivot_weather_table(session,config.valid_weather_data)
