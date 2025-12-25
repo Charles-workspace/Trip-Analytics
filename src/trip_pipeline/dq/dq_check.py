@@ -61,7 +61,7 @@ class DQCheck :
         valid_count = df_valid.count()
         invalid_count = df_invalid.count()
 
-        self.logger.info("DQ null check completed | total=%d | invalid=%d | valid=%d",
+        self.logger.info("Null check completed | total=%d | invalid=%d | valid=%d",
                          total_count,
                          invalid_count,
                          valid_count
@@ -69,12 +69,12 @@ class DQCheck :
 
         if invalid_count > 0:
             df_invalid.write.mode("overwrite").save_as_table(dq_table_name)
-            self.logger.warning("%d invalid records written to DQ table %s",
+            self.logger.warning("%d Null records written to DQ table %s",
                              invalid_count,
                              dq_table_name)
 
         else:
-            self.logger.info("Null check passed: No null/empty values found in key columns")
+            self.logger.info("Passed: No null/empty values found in key columns")
 
         return df_valid
     
@@ -94,7 +94,7 @@ class DQCheck :
                 .order_by([col(c) for c in self.key_columns])
             )
         )
-
+        total_count = df_full_dedup.count()
         df_clean = df_full_dedup.filter(col('rn') == 1).drop('rn')
         df_dupes = (
             df_full_dedup
@@ -104,10 +104,16 @@ class DQCheck :
         )
 
         dupe_count = df_dupes.count()
+        valid_count = df_clean.count()
+        self.logger.info("Duplicate check completed | total=%d | duplicates=%d | valid=%d",
+                         total_count,
+                         dupe_count,
+                         valid_count
+                         )
         
         if dupe_count > 0:
             df_dupes.write.mode("overwrite").save_as_table(dq_table_name)
-            self.logger.warning("%d duplicate rows found during DQ check", dupe_count)
+            self.logger.warning("%d duplicate rows written to %s table", dupe_count, dq_table_name)
         else:
             self.logger.info("No duplicate rows found during DQ check")
 

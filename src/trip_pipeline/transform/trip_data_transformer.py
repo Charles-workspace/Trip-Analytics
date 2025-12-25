@@ -20,7 +20,7 @@ def trip_records_transformer(session, valid_trip_data):
     logger.info("Trip transformation started")
 
     df = session.table(valid_trip_data)
-    
+    df = normalize_trip_columns(df)
     transformed_df=(
         df.with_column("pickup_time",to_timestamp(col("tpep_pickup_datetime")))
         .with_column("dropoff_time",to_timestamp(col("tpep_dropoff_datetime")))
