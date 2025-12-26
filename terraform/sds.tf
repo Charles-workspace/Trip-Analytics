@@ -106,6 +106,16 @@ column {
     name = "cbd_congestion_fee"
     type = "STRING"
   }
+
+  column {
+    name = "created_at"
+    type = "TIMESTAMP_NTZ"
+  }
+
+  column {
+    name = "created_by"
+    type = "STRING"
+  }
 }
 
 resource "snowflake_table" "weather_data_sds" {
@@ -139,6 +149,16 @@ resource "snowflake_table" "weather_data_sds" {
 
   column {
     name = "value"
+    type = "STRING"
+  }
+
+  column {
+    name = "created_at"
+    type = "TIMESTAMP_NTZ"
+  }
+
+  column {
+    name = "created_by"
     type = "STRING"
   }
 }
@@ -198,4 +218,12 @@ resource "snowflake_table" "weather_data_pivoted" {
     name = "Wdf5" 
     type = "FLOAT" 
     }
+  column {
+    name = "created_at"
+    type = "TIMESTAMP_NTZ"
+  }
+  column {
+    name = "created_by"
+    type = "STRING"
+  }
 }
