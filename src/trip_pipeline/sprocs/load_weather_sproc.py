@@ -11,6 +11,8 @@ def run(session: Session) -> str:
     """
     try:
         load_weather_from_stage(session)
+        session.sql("COMMIT").collect()
         return (f"SP_LOAD_WEATHER_FROM_STAGE: Weather data loaded successfully ")
     except Exception as e:
+        session.sql("ROLLBACK").collect()
         return f"SP_LOAD_WEATHER_FROM_STAGE failed: {e}"
