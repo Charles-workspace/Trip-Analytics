@@ -13,3 +13,6 @@ __pycache__/
 *.tar.gz
 *.pem
 *json
+*tfstate*
+*tfvars
+*terraform.lock.hcl
