@@ -13,6 +13,8 @@ def run(session: Session) -> str:
     """
     try:
         load_trip_from_stage(session)
+        session.sql("COMMIT").collect()
         return "SP_LOAD_TRIP_FROM_STAGE: Trip data successfully loaded."
     except Exception as e:
+        session.sql("ROLLBACK").collect()
         return f"SP_LOAD_TRIP_FROM_STAGE: Failed with error: {e}"

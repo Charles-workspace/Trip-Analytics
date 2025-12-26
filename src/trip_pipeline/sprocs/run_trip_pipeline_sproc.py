@@ -17,6 +17,8 @@ def run(session: Session) -> str:
     """
     try:
         pipeline_main(session)
+        session.sql("COMMIT").collect()
         return (f"SP_RUN_TRIP_PIPELINE: Pipeline executed successfully ")
     except Exception as e:
+        session.sql("ROLLBACK").collect()
         return f"SP_RUN_TRIP_PIPELINE failed: {e}"
