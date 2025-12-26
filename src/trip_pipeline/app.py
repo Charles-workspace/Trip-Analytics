@@ -27,7 +27,7 @@ def main(session):
         df_after_nulls = dq.null_check(df_trip_orig, config.trip_null)
 
         # Trip data duplicate check
-        df_after_dupes = dq.duplicate_check(df_after_nulls,config.trip_duplicates)
+        df_after_dupes = dq.duplicate_check(df_after_nulls,config.trip_null)
 
         # Trip data invalid junk data check
         df_junk_ts,df_clean_ts = dq.validate_trip_data(df_after_dupes, config.trip_ts_columns,
@@ -40,7 +40,7 @@ def main(session):
         clean_count = df_clean_int.count()
 
         if invalids_count > 0:
-            datatype_invalids.write.mode("overwrite").save_as_table(config.invalid_trip_data)
+            datatype_invalids.write.mode("overwrite").save_as_table(config.trip_null)
             logger.warning("%d Invalid trip data records with junk values found", invalids_count)
         else:
             logger.info("No Invalid trip data records with junk values found.")
@@ -68,7 +68,7 @@ def main(session):
 
         df_after_nulls = dq.null_check(df_weather, config.weather_null)
         
-        df_after_dupes = dq.duplicate_check(df_after_nulls, config.weather_duplicates)
+        df_after_dupes = dq.duplicate_check(df_after_nulls, config.weather_null)
 
         df_junk_ts,df_clean_ts = dq.validate_weather_data(df_after_dupes,
                                                         config.weather_ts_columns, "timestamp_type",
@@ -83,7 +83,7 @@ def main(session):
         clean_count = df_clean_int.count()
 
         if invalids_count > 0:
-            datatype_invalids.write.mode("overwrite").save_as_table(config.invalid_weather_data)
+            datatype_invalids.write.mode("overwrite").save_as_table(config.weather_null)
             logger.warning("%d Invalid Weather data records with junk values found", invalids_count)
         else:
             logger.info("No Invalid Weather data records with junk values found.")
