@@ -1,11 +1,11 @@
-resource "snowflake_table" "trip_data_null_records" {
-  name      = "TRIP_DATA_NULL_RECORDS"
+resource "snowflake_table" "trip_data_dq" {
+  name      = "TRIP_DATA_DQ"
   database  = snowflake_database.inbound_integration.name
   schema    = snowflake_schema.dq_check_trip.name
   depends_on = [
     snowflake_schema.dq_check_trip
   ]
-  comment   = "Rows with Null values for YELLOW_TRIP_RECORDS Table"
+  comment   = "Records that failed DQ check for YELLOW_TRIP_RECORDS Table"
 
   column {
     name = "VendorID"
@@ -129,14 +129,14 @@ resource "snowflake_table" "trip_data_null_records" {
 
 }
 
-resource "snowflake_table" "weather_null_records" {
-  name      = "WEATHER_NULL_RECORDS"
+resource "snowflake_table" "weather_data_dq" {
+  name      = "WEATHER_DATA_DQ"
   database  = snowflake_database.inbound_integration.name
   schema    = snowflake_schema.dq_check_weather.name
   depends_on = [
     snowflake_schema.dq_check_weather
   ]
-  comment   = "Null records for key columns from NYC Weather Data Table - unpivoted"
+  comment   = "Records that failed DQ check from NYC Weather Data Table - unpivoted"
 
   column {
     name = "date"

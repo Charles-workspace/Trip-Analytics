@@ -24,10 +24,10 @@ def main(session):
         dq = DQCheck(session, config.trip_key_cols)
 
         # Trip data null check
-        df_after_nulls = dq.null_check(df_trip_orig, config.trip_null)
+        df_after_nulls = dq.null_check(df_trip_orig, config.trip_dq)
 
         # Trip data duplicate check
-        df_after_dupes = dq.duplicate_check(df_after_nulls,config.trip_null)
+        df_after_dupes = dq.duplicate_check(df_after_nulls,config.trip_dq)
 
         # Trip data invalid junk data check
         df_junk_ts,df_clean_ts = dq.validate_trip_data(df_after_dupes, config.trip_ts_columns,
@@ -40,7 +40,7 @@ def main(session):
         clean_count = df_clean_int.count()
 
         if invalids_count > 0:
-            datatype_invalids.write.mode("overwrite").save_as_table(config.trip_null)
+            datatype_invalids.write.mode("overwrite").save_as_table(config.trip_dq)
             logger.warning("%d Invalid trip data records with junk values found", invalids_count)
         else:
             logger.info("No Invalid trip data records with junk values found.")
@@ -66,9 +66,9 @@ def main(session):
         logger.info("Starting Weather DQ checks")
         dq = DQCheck(session, config.weather_key_cols)
 
-        df_after_nulls = dq.null_check(df_weather, config.weather_null)
+        df_after_nulls = dq.null_check(df_weather, config.weather_dq)
         
-        df_after_dupes = dq.duplicate_check(df_after_nulls, config.weather_null)
+        df_after_dupes = dq.duplicate_check(df_after_nulls, config.weather_dq)
 
         df_junk_ts,df_clean_ts = dq.validate_weather_data(df_after_dupes,
                                                         config.weather_ts_columns, "timestamp_type",
@@ -83,7 +83,7 @@ def main(session):
         clean_count = df_clean_int.count()
 
         if invalids_count > 0:
-            datatype_invalids.write.mode("overwrite").save_as_table(config.weather_null)
+            datatype_invalids.write.mode("overwrite").save_as_table(config.weather_dq)
             logger.warning("%d Invalid Weather data records with junk values found", invalids_count)
         else:
             logger.info("No Invalid Weather data records with junk values found.")
