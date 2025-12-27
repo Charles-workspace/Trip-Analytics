@@ -79,4 +79,12 @@ resource "snowflake_table" "trip_analytics" {
     name = "Wdf5"
     type = "STRING"
   }
+    column {
+    name = "created_at"
+    type = "TIMESTAMP_NTZ"
+  }
+  column {
+    name = "created_by"
+    type = "STRING"
+  }
 }
