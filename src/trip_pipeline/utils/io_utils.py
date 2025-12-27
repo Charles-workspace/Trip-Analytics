@@ -34,6 +34,7 @@ def copy_into_table(
         FILE_FORMAT = ({ff_clause})
         MATCH_BY_COLUMN_NAME = {match_by_column_name}
         {pattern_clause}
+        FORCE = TRUE
     """
     print(f"Running COPY INTO for {table_name} from {stage_ref}")
     session.sql(sql).collect()

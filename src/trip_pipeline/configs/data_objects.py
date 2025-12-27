@@ -15,15 +15,11 @@ class Tableconfig:
     weather_ts_columns: list
     weather_data_columns: list
 
-    trip_null: str
-    invalid_trip_data: str
+    trip_dq: str
     valid_trip_data: str
-    trip_duplicates: str
     raw_trip_data: str
-    weather_null: str
-    weather_duplicates: str
+    weather_dq: str
     valid_weather_data: str
-    invalid_weather_data: str
     raw_weather_data: str
     pivoted_weather_table: str
     zone_lookup: str
@@ -34,6 +30,8 @@ class Tableconfig:
     weather_start_date: date
     weather_end_date: date
     min_valid_epoch: int
+
+    ETL_created_by: str 
 
 
 config = Tableconfig(
@@ -52,17 +50,13 @@ weather_key_cols = ['"date"', '"datatype"'],
 
 
 raw_trip_data = "INBOUND_INTEGRATION.LANDING_TRIP.YELLOW_TRIP_RECORDS",
-trip_null = "INBOUND_INTEGRATION.DQ_TRIP.TRIP_DATA_NULL_RECORDS",
-trip_duplicates = "INBOUND_INTEGRATION.DQ_TRIP.TRIP_DATA_DUPLICATES",
-invalid_trip_data = "INBOUND_INTEGRATION.DQ_TRIP.INVALID_TRIP_DATA",
+trip_dq = "INBOUND_INTEGRATION.DQ_TRIP.TRIP_DATA_DQ",
 valid_trip_data="INBOUND_INTEGRATION.SDS_TRIP.TRIP_DATA_VALIDATED",
 
 trip_stage_name="INBOUND_INTEGRATION.LANDING_TRIP.LANDING_TRIP_STAGE",
 
 raw_weather_data="INBOUND_INTEGRATION.LANDING_WEATHER.NYC_WEATHER",
-weather_null = "INBOUND_INTEGRATION.DQ_WEATHER.WEATHER_NULL_RECORDS",
-weather_duplicates = "INBOUND_INTEGRATION.DQ_WEATHER.WEATHER_DATA_DUPLICATES",
-invalid_weather_data = "INBOUND_INTEGRATION.DQ_WEATHER.INVALID_WEATHER_DATA",
+weather_dq = "INBOUND_INTEGRATION.DQ_WEATHER.WEATHER_DATA_DQ",
 valid_weather_data = "INBOUND_INTEGRATION.SDS_WEATHER.WEATHER_DATA_VALIDATED",
 
 pivoted_weather_table = "INBOUND_INTEGRATION.SDS_WEATHER.WEATHER_DATA_PIVOTED",
@@ -75,5 +69,6 @@ weather_stage_name="INBOUND_INTEGRATION.LANDING_WEATHER.LANDING_WEATHER_STAGE",
 weather_start_date=date(2025, 5, 1),
 weather_end_date=date(2025, 5, 31),
 
-min_valid_epoch = 1600000000000
+min_valid_epoch = 1600000000000,
+ETL_created_by = "TripAnalytics_ETL_User"
 )

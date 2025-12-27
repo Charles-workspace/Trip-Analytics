@@ -19,6 +19,7 @@ def load_trip_from_stage(session):
         file_format_type="PARQUET",
         pattern=".*yellow_tripdata_.*\\.parquet.*",
     )
+    logger.info("Trip data loaded from stage to landing table.")
 
     # Taxi zone lookup CSV
     copy_into_table(
@@ -32,4 +33,5 @@ def load_trip_from_stage(session):
         },
         pattern=".*taxi_zone_lookup.\\.csv.*",
     )
-    logger.info("Trip data and zone lookup data loaded from stage to raw tables.")
+    
+    logger.info("Trip data and zone lookup data loaded from stage to landing tables.")

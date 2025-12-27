@@ -3,6 +3,7 @@ from snowflake.snowpark.window import Window
 from snowflake.snowpark.types import IntegerType,TimestampType
 from trip_pipeline.configs.data_objects import config
 from trip_pipeline.utils.logger import get_logger
+from trip_pipeline.utils.metadata_utils import add_etl_metadata_dq
 
 class DQCheck :
     """
@@ -68,7 +69,8 @@ class DQCheck :
                          )
 
         if invalid_count > 0:
-            df_invalid.write.mode("overwrite").save_as_table(dq_table_name)
+            df_invalid = add_etl_metadata_dq(df_invalid, "Null_Check", error_message=None)
+            df_invalid.write.mode("append").save_as_table(dq_table_name)
             self.logger.warning("%d Null records written to DQ table %s",
                              invalid_count,
                              dq_table_name)
@@ -100,7 +102,6 @@ class DQCheck :
             df_full_dedup
             .filter(col('rn') != 1)
             .drop('rn')
-            .with_column("dq_ts", current_timestamp())
         )
 
         dupe_count = df_dupes.count()
@@ -112,14 +113,15 @@ class DQCheck :
                          )
         
         if dupe_count > 0:
-            df_dupes.write.mode("overwrite").save_as_table(dq_table_name)
+            df_dupes = add_etl_metadata_dq(df_dupes, "Duplicate_Check", error_message=None)
+            df_dupes.write.mode("append").save_as_table(dq_table_name)
             self.logger.warning("%d duplicate rows written to %s table", dupe_count, dq_table_name)
         else:
             self.logger.info("No duplicate rows found during DQ check")
 
         return df_clean
 
-    def validate_trip_data(self, df, columns, dtype, min_valid_epoch=config.min_valid_epoch):
+    def validate_trip_data(self, df, columns, dtype):
         """
         Flags rows where timestamp fields are present but invalid:
         - Either not castable to integer
@@ -133,15 +135,30 @@ class DQCheck :
             condition = None
 
             if dtype == "timestamp_type":
-                condition = ((casted_col.is_null()) | (casted_col < min_valid_epoch))
-            else :
+                condition = ((casted_col.is_null()) | (casted_col < config.min_valid_epoch))
+            elif dtype == "integer_type":
                 condition = casted_col.is_null()
+            else:
+                self.logger.warning("Unsupported dtype for junk check: %s", dtype)
 
             junk_condition = condition if junk_condition is None else (junk_condition | condition)
+    
+            invalid_df = df.filter(junk_condition)
+            invalid_df = add_etl_metadata_dq(invalid_df, "Datatype validation : Trip data", error_message=f"Junk value found for {dtype}")
+            clean_df = df.filter(~junk_condition)
 
-        return df.filter(junk_condition),df.filter(~junk_condition)
+        return invalid_df,clean_df
 
     def validate_weather_data (self,df,columns,dtype,weather_data_types):
+        """
+        Docstring for validate_weather_data
+        
+        :param df: the dataframe to be validated
+        :param columns: the key columns to be checked
+        :param dtype: whether timestamp or datatype check. 
+        :param weather_data_types: Weather Datatypes includes the list of weather attributes 
+        included in the config file
+        """
         junk_condition = None
 
         for column in columns:
@@ -156,8 +173,10 @@ class DQCheck :
             else:
                 self.logger.warning("Unsupported dtype for junk check: %s", dtype)
 
-            junk_condition = (
-                condition if junk_condition is None else junk_condition | condition
-            )
+            junk_condition = condition if junk_condition is None else junk_condition | condition
 
-        return df.filter(junk_condition),df.filter(~junk_condition)
+            invalid_df = df.filter(junk_condition)
+            invalid_df = add_etl_metadata_dq(invalid_df, "Datatype validation : Weather data", error_message=f"Junk value found for {dtype}")
+            clean_df = df.filter(~junk_condition)
+
+        return invalid_df,clean_df

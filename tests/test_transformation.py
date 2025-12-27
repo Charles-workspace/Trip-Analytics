@@ -26,6 +26,8 @@ def test_trip_records_transformer(mock_to_date, mock_to_timestamp):
     assert df.with_column_renamed.call_count >= 3  
     df.select.assert_called_once()
 
+    mock_to_date.assert_called()
+    mock_to_timestamp.assert_called()
     assert result == final_df
 
 def test_pivot_weather_table():
@@ -50,6 +52,8 @@ def test_pivot_weather_table():
 
     session.table.assert_called_once_with("RAW_WEATHER")
     df.group_by.assert_called_once_with("date")
+    df.group_by.return_value.pivot.assert_called_once()
+    df.group_by.return_value.pivot.return_value.agg.assert_called_once()
     pivoted.select.assert_called_once()
 
     assert result == final
