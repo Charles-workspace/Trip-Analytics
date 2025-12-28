@@ -29,7 +29,8 @@ def load_trip_from_stage(session):
         file_format_type="CSV",
         file_format_options={
             "FIELD_OPTIONALLY_ENCLOSED_BY": "'\"'",
-            "PARSE_HEADER": "TRUE"
+            "SKIP_HEADER": "1",
+            "ERROR_ON_COLUMN_COUNT_MISMATCH": "FALSE"
         },
         pattern=".*taxi_zone_lookup.\\.csv.*",
     )

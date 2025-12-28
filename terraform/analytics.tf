@@ -9,83 +9,83 @@ resource "snowflake_table" "trip_analytics" {
   comment   = "Final consolidated table with trip and weather data"
 
   column {
-    name = "VendorID"
+    name = "vendor_id"
     type = "STRING"
   }
 
   column {
-    name = "PickupAddress"
+    name = "pickup_address"
     type = "STRING"
   }
 
   column {
-    name = "DropAddress"
+    name = "drop_address"
     type = "STRING"
   }
 
   column {
-    name = "PickupTime"
+    name = "pickup_time"
     type = "STRING"
   }
   column {
-    name = "DropoffTime"
+    name = "dropoff_time"
     type = "STRING"
   }
   column {
-    name = "TripDistance"
+    name = "trip_distance"
     type = "STRING"
   }
   column {
-    name = "TotalAmount"
+    name = "total_amount"
     type = "STRING"
   }
   column {
-    name = "Tmin"
+    name = "tmin"
     type = "STRING"
   }
   column {
-    name = "Tmax"
+    name = "tmax"
     type = "STRING"
   }
   column {
-    name = "Prcp"
+    name = "prcp"
     type = "STRING"
   }
   column {
-    name = "Snow"
+    name = "snow"
     type = "STRING"
   }
   column {
-    name = "Snwd"
+    name = "snwd"
     type = "STRING"
   }
   column {
-    name = "Awnd"
+    name = "awnd"
     type = "STRING"
   }
   column {
-    name = "Wsf2"
+    name = "wsf2"
     type = "STRING"
   }
   column {
-    name = "Wdf2"
+    name = "wdf2"
     type = "STRING"
   }
   column {
-    name = "Wsf5"
+    name = "wsf5"
     type = "STRING"
   }
   column {
-    name = "Wdf5"
+    name = "wdf5"
     type = "STRING"
   }
    column {
-    name = "CREATED_AT"
+    name = "created_at"
     type = "TIMESTAMP_NTZ"
   }
 
   column {
-    name = "CREATED_BY"
+    name = "created_by"
     type = "STRING"
   }
 }
