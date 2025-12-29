@@ -29,10 +29,11 @@ def load_trip_from_stage(session):
         file_format_type="CSV",
         file_format_options={
             "FIELD_OPTIONALLY_ENCLOSED_BY": "'\"'",
-            "SKIP_HEADER": "1",
-            "ERROR_ON_COLUMN_COUNT_MISMATCH": "FALSE"
+            "PARSE_HEADER": "TRUE"
         },
-        pattern=".*taxi_zone_lookup.\\.csv.*",
+        pattern=".*taxi_zone_lookup.csv",
+        match_by_column_name="CASE_INSENSITIVE",
+        force=True
     )
     
     logger.info("Trip data and zone lookup data loaded from stage to landing tables.")
