@@ -19,6 +19,7 @@ def load_trip_from_stage(session):
         file_format_type="PARQUET",
         pattern=".*yellow_tripdata_.*\\.parquet.*",
     )
+    logger.info("Trip data loaded from stage to landing table.")
 
     # Taxi zone lookup CSV
     copy_into_table(
@@ -30,6 +31,9 @@ def load_trip_from_stage(session):
             "FIELD_OPTIONALLY_ENCLOSED_BY": "'\"'",
             "PARSE_HEADER": "TRUE"
         },
-        pattern=".*taxi_zone_lookup.\\.csv.*",
+        pattern=".*taxi_zone_lookup.csv",
+        match_by_column_name="CASE_INSENSITIVE",
+        force=True
     )
-    logger.info("Trip data and zone lookup data loaded from stage to raw tables.")
+    
+    logger.info("Trip data and zone lookup data loaded from stage to landing tables.")

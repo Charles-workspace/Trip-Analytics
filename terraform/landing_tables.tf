@@ -27,15 +27,6 @@ resource "snowflake_table" "taxi_zone_lookup" {
     type = "STRING"
   }
 
-  column {
-    name = "created_at"
-    type = "TIMESTAMP_NTZ"
-  }
-
-  column {
-    name = "created_by"
-    type = "STRING"
-  }
 }
 
 resource "snowflake_table" "yellow_trip_records" {
@@ -146,15 +137,6 @@ resource "snowflake_table" "yellow_trip_records" {
     name = "cbd_congestion_fee"
     type = "STRING"
   }
-  column {
-    name = "created_at"
-    type = "TIMESTAMP_NTZ"
-  }
-
-  column {
-    name = "created_by"
-    type = "STRING"
-  }
 }
 
 resource "snowflake_table" "nyc_weather" {
@@ -188,16 +170,6 @@ resource "snowflake_table" "nyc_weather" {
 
   column {
     name = "value"
-    type = "STRING"
-  }
-
-  column {
-    name = "created_at"
-    type = "TIMESTAMP_NTZ"
-  }
-
-  column {
-    name = "created_by"
     type = "STRING"
   }
 }
