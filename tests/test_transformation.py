@@ -6,7 +6,6 @@ from trip_pipeline.configs.data_objects import config
 @patch("src.trip_pipeline.transform.trip_data_transformer.to_timestamp")
 @patch("src.trip_pipeline.transform.trip_data_transformer.to_date")
 def test_trip_records_transformer(mock_to_date, mock_to_timestamp):
-    # mock session + table
     session = MagicMock()
     df = MagicMock()
     final_df = MagicMock()
@@ -21,7 +20,6 @@ def test_trip_records_transformer(mock_to_date, mock_to_timestamp):
 
     session.table.assert_called_once_with(config.valid_trip_data)
 
-    # Verify expected transformation calls
     assert df.with_column.call_count >= 3  
     assert df.with_column_renamed.call_count >= 3  
     df.select.assert_called_once()
@@ -39,13 +37,12 @@ def test_pivot_weather_table():
     # Mock session.table
     session.table.return_value = df
 
-    # Mock datatype discovery
     df.select.return_value.distinct.return_value.collect.return_value = [("TMIN",),("TMAX",),("PRCP",)]
 
     # Mock pivot chain
     df.group_by.return_value.pivot.return_value.agg.return_value = pivoted
 
-    pivoted.with_column.return_value = pivoted   # date -> o_date assign
+    pivoted.with_column.return_value = pivoted 
     pivoted.select.return_value = final
 
     result = pivot_weather_table(session, "RAW_WEATHER")
