@@ -19,3 +19,4 @@ set_sf_env.sh
 *.pyc
 airflow/logs/
 *py.log
+to_do.txt
